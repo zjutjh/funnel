@@ -1,83 +1,40 @@
 package main
 
 import (
-	"encoding/json"
-	funnel "funnel/app"
+	"funnel/app/controller"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
-	"time"
 )
 
-func RedisInit() *redis.Client {
-	RedisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
-		DB:   0,
-	})
-
-	_, err := RedisClient.Ping().Result()
-	if err != nil {
-		panic("redis ping error")
-	}
-	return RedisClient
-}
-
 func main() {
-	ts := funnel.TeachingAdministrationSystem{RootUrl: "http://172.16.19.163/jwglxt/"}
 	r := gin.Default()
-
-	redisX := RedisInit()
+	store, _ := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret"))
+	r.Use(sessions.Sessions("sessions", store))
 
 	r.Group("/v2")
 	{
 		r.Group("/student")
 		{
-			r.POST("/login", func(c *gin.Context) {
+			r.Group("/zf")
+			{
+				r.POST("/login", controller.ZFLogin)
+				r.GET("/score-info/:year/:term", controller.GetScoreDetail)
+				r.GET("/score/:year/:term", controller.GetScore)
+				r.GET("/class-table/:year/:term", controller.GetClassTable)
+				r.GET("/exam/:username/:year/:term", controller.GetExamInfo)
+			}
+			r.Group("/library")
+			{
 
-				name := c.PostForm("username")
-				passwd := c.PostForm("password")
-				stu := funnel.Student{Sid: name, Password: passwd}
+			}
+		}
+		r.Group("/teacher")
+		{
 
-				for {
-					err := ts.Login(&stu)
-					if err == nil {
-						break
-					}
-				}
-				ser, _ := json.Marshal(stu)
-				redisX.Set(stu.Sid, string(ser), time.Duration(stu.Session.MaxAge))
-				redisX.Save()
-
-				c.Data(200, "application/json", []byte("OK"))
-			})
-
-			r.GET("/score-info/:username/:year/:term", func(c *gin.Context) {
-				stuSer, _ := redisX.Get(c.Param("username")).Result()
-				stu := &funnel.Student{}
-				_ = json.Unmarshal([]byte(stuSer), stu)
-				c.Data(200, "application/json", []byte(ts.GetScoreDetail(stu, c.Param("year"), c.Param("term"))))
-			})
-			r.GET("/score/:username/:year/:term", func(c *gin.Context) {
-				stuSer, _ := redisX.Get(c.Param("username")).Result()
-				stu := &funnel.Student{}
-				_ = json.Unmarshal([]byte(stuSer), stu)
-				c.Data(200, "application/json", []byte(ts.GetScore(stu, c.Param("year"), c.Param("term"))))
-			})
-
-			r.GET("/class/:username/:year/:term", func(c *gin.Context) {
-				stuSer, _ := redisX.Get(c.Param("username")).Result()
-				stu := &funnel.Student{}
-				_ = json.Unmarshal([]byte(stuSer), stu)
-				c.Data(200, "application/json", []byte(ts.GetClassTable(stu, c.Param("year"), c.Param("term"))))
-			})
-			r.GET("/exam/info/:username/:year/:term", func(c *gin.Context) {
-				stuSer, _ := redisX.Get(c.Param("username")).Result()
-				stu := &funnel.Student{}
-				_ = json.Unmarshal([]byte(stuSer), stu)
-				c.Data(200, "application/json", []byte(ts.GetExamInfo(stu, c.Param("year"), c.Param("term"))))
-			})
 		}
 
 	}
 
-	r.Run() // listen and serve on 0.0.0.0:8080
+	_ = r.Run() // listen and serve on 0.0.0.0:8080
 }
