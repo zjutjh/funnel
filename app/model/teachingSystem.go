@@ -1,14 +1,13 @@
 package model
 
 import (
+	"funnel/app/apis"
 	"funnel/app/errors"
 	"funnel/app/helps"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
-	"time"
 )
 
 type TeachingSystem struct {
@@ -16,22 +15,17 @@ type TeachingSystem struct {
 	ClassTableUrl string
 }
 
-func (t *TeachingSystem) GetClassTable(stu *ZFUser, year string, term string) string {
-	res, _ := fetchTermRelatedInfo(t.RootUrl+"kbcx/xskbcx_cxXsKb.html", year, term, stu)
-	return res
+func (t *TeachingSystem) GetClassTable(stu *ZFUser, year string, term string) (string,error) {
+	return fetchTermRelatedInfo(apis.ZfClassTable, year, term, stu)
 }
-func (t *TeachingSystem) GetExamInfo(stu *ZFUser, year string, term string) string {
-	res, _ := fetchTermRelatedInfo(t.RootUrl+"/kwgl/kscx_cxXsksxxIndex.html", year, term, stu)
-	return res
+func (t *TeachingSystem) GetExamInfo(stu *ZFUser, year string, term string) (string,error) {
+	return fetchTermRelatedInfo(apis.ZfExamInfo, year, term, stu)
 }
-func (t *TeachingSystem) GetScoreDetail(stu *ZFUser, year string, term string) string {
-	res, _ := fetchTermRelatedInfo(t.RootUrl+"cjcx/cjcx_cxXsKccjList.html", year, term, stu)
-	return res
+func (t *TeachingSystem) GetScoreDetail(stu *ZFUser, year string, term string) (string,error) {
+	return fetchTermRelatedInfo(apis.ZfScoreDetail, year, term, stu)
 }
-func (t *TeachingSystem) GetScore(stu *ZFUser, year string, term string) string {
-
-	res, _ := fetchTermRelatedInfo(t.RootUrl+"cjcx/cjcx_cxDgXscj.html?doType=query", year, term, stu)
-	return res
+func (t *TeachingSystem) GetScore(stu *ZFUser, year string, term string) (string,error) {
+	return fetchTermRelatedInfo(apis.ZfScore, year, term, stu)
 }
 
 func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *ZFUser) (string, error) {
@@ -61,25 +55,25 @@ func (t *TeachingSystem) Login(stu *ZFUser) error {
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
 
-	url0 := t.RootUrl + "xtgl/login_slogin.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
+	url0 := apis.ZfLoginHome
 	response, _ := client.Get(url0)
 	JSESSIONID := response.Cookies()[0]
 
-	publicKeyUrl := t.RootUrl + helps.ZfLoginGetPublickey
+	publicKeyUrl := apis.ZfLoginGetPublickey
 	request, _ := http.NewRequest("GET", publicKeyUrl, nil)
 	request.AddCookie(JSESSIONID)
 	response, _ = client.Do(request)
 	s, _ := ioutil.ReadAll(response.Body)
-	encodePassword,_ := helps.GetEncodePassword(s, []byte(stu.Password))
+	encodePassword, _ := helps.GetEncodePassword(s, []byte(stu.Password))
 
-	url2 := t.RootUrl + "kaptcha?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
+	url2 := apis.ZfLoginKaptcha
 	request, _ = http.NewRequest("GET", url2, nil)
 	request.AddCookie(JSESSIONID)
 	response, _ = client.Do(request)
 	s, _ = ioutil.ReadAll(response.Body)
-	captcha,_ := helps.BreakCaptcha(s)
+	captcha, _ := helps.BreakCaptcha(s)
 
-	url4 := t.RootUrl + "xtgl/login_slogin.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
+	url4 := apis.ZfLoginHome
 	data4 := url.Values{"yhm": {stu.Username}, "mm": {encodePassword}, "yzm": {captcha}}
 	request, _ = http.NewRequest("POST", url4, strings.NewReader(data4.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")

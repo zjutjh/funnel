@@ -20,8 +20,9 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 			}
 			r.Group("/library")
 			{
-				r.POST("/login", controller.LibraryLogin)
+				r.POST("/library/login", controller.LibraryLogin)
 				r.GET("/borrow/history/:page", controller.LibraryBorrowHistory)
+				r.GET("/borrow/current/:page", controller.LibraryCurrentBorrow)
 			}
 		}
 		r.Group("/teacher")

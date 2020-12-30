@@ -5,9 +5,14 @@ type ResponseError struct {
 	Message string
 }
 
-var OK = ResponseError{200, "OK"}
+func (r ResponseError) Error() string {
+	panic("implement me")
+}
 
-var WrongPassword = ResponseError{403, "密码错误"}
-var UnKnown = ResponseError{403, "未知错误"}
+var OK = ResponseError{200, "OK"}
+var UnKnown = ResponseError{500, "未知错误"}
+var RequestFailed = ResponseError{500, "请求错误"}
 
 var NotLogin = ResponseError{403, "未登录"}
+var WrongPassword = ResponseError{403, "密码错误"}
+

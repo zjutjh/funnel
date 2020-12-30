@@ -16,15 +16,15 @@ type RSAPublicKey struct {
 }
 
 func GetEncodePassword(publickey []byte, password []byte) (string,error) {
-	pubkey := &RSAPublicKey{}
-	err := json.Unmarshal(publickey, pubkey)
+	K := &RSAPublicKey{}
+	err := json.Unmarshal(publickey, K)
 	if err != nil{
 		return "",err
 	}
 
-	nString, _ := base64.StdEncoding.DecodeString(pubkey.Modulus)
+	nString, _ := base64.StdEncoding.DecodeString(K.Modulus)
 	n, _ := new(big.Int).SetString(hex.EncodeToString(nString), 16)
-	eString, _ := base64.StdEncoding.DecodeString(pubkey.Exponent)
+	eString, _ := base64.StdEncoding.DecodeString(K.Exponent)
 	e, _ := strconv.ParseInt(hex.EncodeToString(eString), 16, 32)
 	pub := rsa.PublicKey{E: int(e), N: n}
 	cc, err := rsa.EncryptPKCS1v15(rand.Reader, &pub, password)
