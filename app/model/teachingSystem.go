@@ -1,9 +1,8 @@
-package funnel
+package model
 
 import (
 	"funnel/app/errors"
 	"funnel/app/helps"
-	"funnel/app/model"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -17,25 +16,25 @@ type TeachingSystem struct {
 	ClassTableUrl string
 }
 
-func (t *TeachingSystem) GetClassTable(stu *model.Student, year string, term string) string {
+func (t *TeachingSystem) GetClassTable(stu *ZFUser, year string, term string) string {
 	res, _ := fetchTermRelatedInfo(t.RootUrl+"kbcx/xskbcx_cxXsKb.html", year, term, stu)
 	return res
 }
-func (t *TeachingSystem) GetExamInfo(stu *model.Student, year string, term string) string {
+func (t *TeachingSystem) GetExamInfo(stu *ZFUser, year string, term string) string {
 	res, _ := fetchTermRelatedInfo(t.RootUrl+"/kwgl/kscx_cxXsksxxIndex.html", year, term, stu)
 	return res
 }
-func (t *TeachingSystem) GetScoreDetail(stu *model.Student, year string, term string) string {
+func (t *TeachingSystem) GetScoreDetail(stu *ZFUser, year string, term string) string {
 	res, _ := fetchTermRelatedInfo(t.RootUrl+"cjcx/cjcx_cxXsKccjList.html", year, term, stu)
 	return res
 }
-func (t *TeachingSystem) GetScore(stu *model.Student, year string, term string) string {
+func (t *TeachingSystem) GetScore(stu *ZFUser, year string, term string) string {
 
 	res, _ := fetchTermRelatedInfo(t.RootUrl+"cjcx/cjcx_cxDgXscj.html?doType=query", year, term, stu)
 	return res
 }
 
-func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *model.Student) (string, error) {
+func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *ZFUser) (string, error) {
 
 	client := &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
 	requestData := url.Values{"xnm": {year}, "xqm": {term}, "queryModel.showCount": {"1500"}}
@@ -57,7 +56,7 @@ func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *mode
 	return string(s), nil
 }
 
-func (t *TeachingSystem) Login(stu *model.Student) error {
+func (t *TeachingSystem) Login(stu *ZFUser) error {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
@@ -66,22 +65,22 @@ func (t *TeachingSystem) Login(stu *model.Student) error {
 	response, _ := client.Get(url0)
 	JSESSIONID := response.Cookies()[0]
 
-	publicKeyUrl := t.RootUrl + "xtgl/login_getPublicKey.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
+	publicKeyUrl := t.RootUrl + helps.ZfLoginGetPublickey
 	request, _ := http.NewRequest("GET", publicKeyUrl, nil)
 	request.AddCookie(JSESSIONID)
 	response, _ = client.Do(request)
 	s, _ := ioutil.ReadAll(response.Body)
-	encodePassword := helps.GetEncodePassword(s, []byte(stu.Password))
+	encodePassword,_ := helps.GetEncodePassword(s, []byte(stu.Password))
 
 	url2 := t.RootUrl + "kaptcha?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
 	request, _ = http.NewRequest("GET", url2, nil)
 	request.AddCookie(JSESSIONID)
 	response, _ = client.Do(request)
 	s, _ = ioutil.ReadAll(response.Body)
-	captcha := helps.BreakCaptcha(s)
+	captcha,_ := helps.BreakCaptcha(s)
 
 	url4 := t.RootUrl + "xtgl/login_slogin.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
-	data4 := url.Values{"yhm": {stu.Sid}, "mm": {encodePassword}, "yzm": {captcha}}
+	data4 := url.Values{"yhm": {stu.Username}, "mm": {encodePassword}, "yzm": {captcha}}
 	request, _ = http.NewRequest("POST", url4, strings.NewReader(data4.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.AddCookie(JSESSIONID)

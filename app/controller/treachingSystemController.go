@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	funnel "funnel/app"
 	"funnel/app/errors"
 	"funnel/app/helps"
 	"funnel/app/model"
@@ -10,11 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var ts = funnel.TeachingSystem{RootUrl: "http://172.16.19.163/jwglxt/"}
+var ts = model.TeachingSystem{RootUrl: "http://172.16.19.163/jwglxt/"}
 
 func ZFLogin(context *gin.Context) {
 	session := sessions.Default(context)
-	stu := model.Student{Sid: context.PostForm("username"), Password: context.PostForm("password")}
+	stu := model.ZFUser{Username: context.PostForm("username"), Password: context.PostForm("password")}
 
 	isLoginSuccess := false
 	for i := 0; i < 10; i++ {
@@ -48,7 +47,7 @@ func GetScoreDetail(context *gin.Context) {
 		return
 	}
 
-	stu := &model.Student{}
+	stu := &model.ZFUser{}
 	_ = json.Unmarshal(ZFSession, stu)
 	context.Data(200, "application/json", []byte(ts.GetScoreDetail(stu, context.Param("year"), context.Param("term"))))
 }
@@ -60,7 +59,7 @@ func GetScore(context *gin.Context) {
 		return
 	}
 
-	stu := &model.Student{}
+	stu := &model.ZFUser{}
 	_ = json.Unmarshal(ZFSession, stu)
 	context.Data(200, "application/json", []byte(ts.GetScore(stu, context.Param("year"), context.Param("term"))))
 }
@@ -73,7 +72,7 @@ func GetClassTable(context *gin.Context) {
 		return
 	}
 
-	stu := &model.Student{}
+	stu := &model.ZFUser{}
 	_ = json.Unmarshal(ZFSession, stu)
 	context.Data(200, "application/json", []byte(ts.GetClassTable(stu, context.Param("year"), context.Param("term"))))
 }
@@ -86,7 +85,7 @@ func GetExamInfo(context *gin.Context) {
 		return
 	}
 
-	stu := &model.Student{}
+	stu := &model.ZFUser{}
 	_ = json.Unmarshal(ZFSession, stu)
 	context.Data(200, "application/json", []byte(ts.GetExamInfo(stu, context.Param("year"), context.Param("term"))))
 }
