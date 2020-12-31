@@ -1,9 +1,10 @@
-package model
+package service
 
 import (
 	"funnel/app/apis"
 	"funnel/app/errors"
 	"funnel/app/helps"
+	"funnel/app/model"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,20 +16,20 @@ type TeachingSystem struct {
 	ClassTableUrl string
 }
 
-func (t *TeachingSystem) GetClassTable(stu *ZFUser, year string, term string) (string,error) {
+func (t *TeachingSystem) GetClassTable(stu *model.ZFUser, year string, term string) (string, error) {
 	return fetchTermRelatedInfo(apis.ZfClassTable, year, term, stu)
 }
-func (t *TeachingSystem) GetExamInfo(stu *ZFUser, year string, term string) (string,error) {
+func (t *TeachingSystem) GetExamInfo(stu *model.ZFUser, year string, term string) (string, error) {
 	return fetchTermRelatedInfo(apis.ZfExamInfo, year, term, stu)
 }
-func (t *TeachingSystem) GetScoreDetail(stu *ZFUser, year string, term string) (string,error) {
+func (t *TeachingSystem) GetScoreDetail(stu *model.ZFUser, year string, term string) (string, error) {
 	return fetchTermRelatedInfo(apis.ZfScoreDetail, year, term, stu)
 }
-func (t *TeachingSystem) GetScore(stu *ZFUser, year string, term string) (string,error) {
+func (t *TeachingSystem) GetScore(stu *model.ZFUser, year string, term string) (string, error) {
 	return fetchTermRelatedInfo(apis.ZfScore, year, term, stu)
 }
 
-func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *ZFUser) (string, error) {
+func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *model.ZFUser) (string, error) {
 
 	client := &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
 	requestData := url.Values{"xnm": {year}, "xqm": {term}, "queryModel.showCount": {"1500"}}
@@ -50,7 +51,7 @@ func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *ZFUs
 	return string(s), nil
 }
 
-func (t *TeachingSystem) Login(stu *ZFUser) error {
+func (t *TeachingSystem) Login(stu *model.ZFUser) error {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
@@ -72,7 +73,6 @@ func (t *TeachingSystem) Login(stu *ZFUser) error {
 	response, _ = client.Do(request)
 	s, _ = ioutil.ReadAll(response.Body)
 	captcha, _ := helps.BreakCaptcha(s)
-
 	url4 := apis.ZfLoginHome
 	data4 := url.Values{"yhm": {stu.Username}, "mm": {encodePassword}, "yzm": {captcha}}
 	request, _ = http.NewRequest("POST", url4, strings.NewReader(data4.Encode()))
@@ -82,13 +82,14 @@ func (t *TeachingSystem) Login(stu *ZFUser) error {
 	response, _ = client.Do(request)
 	s, _ = ioutil.ReadAll(response.Body)
 
-	if strings.Contains(string(s), "验证码") {
+	if strings.Contains(string(s), "验证码输入错误") {
 		return errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
 	if strings.Contains(string(s), "用户名或密码不正确") {
 		return errors.ERR_WRONG_PASSWORD
 	}
 	if len(response.Cookies()) < 2 {
+
 		return errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
 

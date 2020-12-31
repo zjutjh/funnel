@@ -1,9 +1,9 @@
-package model
+package service
 
 import (
-	"fmt"
 	"funnel/app/apis"
 	"funnel/app/errors"
+	"funnel/app/model"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
@@ -16,8 +16,8 @@ type LibrarySystem struct {
 	ClassTableUrl string
 }
 type ReaderInfo struct {
-	CurrentBorrowedCount   string
-	ExtendedCount     string
+	CurrentBorrowedCount string
+	ExtendedCount        string
 }
 type Book struct {
 	Name          string
@@ -29,23 +29,23 @@ type Book struct {
 	IsExtended    string
 }
 
-func (t *LibrarySystem) Login(user *LibraryUser) error {
+func (t *LibrarySystem) Login(user *model.LibraryUser) error {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
 
 	url0 := apis.LibraryLogin
 	loginData := url.Values{
-		"__VIEWSTATE": {apis.Library__VIEWSTATE},
+		"__VIEWSTATE":          {apis.Library__VIEWSTATE},
 		"__VIEWSTATEGENERATOR": {apis.Library__VIEWSTATEGENERATOR},
-		"__EVENTVALIDATION": {apis.Library__EVENTVALIDATION},
-		"TextBox1": {user.Username},
-		"TextBox2": {user.Password},
-		"ImageButton1.x": {"29"},
-		"ImageButton1.y": {"8"}}
+		"__EVENTVALIDATION":    {apis.Library__EVENTVALIDATION},
+		"TextBox1":             {user.Username},
+		"TextBox2":             {user.Password},
+		"ImageButton1.x":       {"29"},
+		"ImageButton1.y":       {"8"}}
 	response, _ := client.PostForm(url0, loginData)
 
-	if len(response.Cookies()) == 0{
+	if len(response.Cookies()) == 0 {
 		return errors.ERR_WRONG_PASSWORD
 	}
 	session := response.Cookies()[0]
@@ -53,7 +53,7 @@ func (t *LibrarySystem) Login(user *LibraryUser) error {
 	return nil
 }
 
-func (t *LibrarySystem) GetBorrowHistory(user *LibraryUser) []Book {
+func (t *LibrarySystem) GetBorrowHistory(user *model.LibraryUser) []Book {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
@@ -80,7 +80,7 @@ func (t *LibrarySystem) GetBorrowHistory(user *LibraryUser) []Book {
 	return books
 }
 
-func (t *LibrarySystem) GetCurrentBorrow(user *LibraryUser) []Book {
+func (t *LibrarySystem) GetCurrentBorrow(user *model.LibraryUser) []Book {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
@@ -96,7 +96,6 @@ func (t *LibrarySystem) GetCurrentBorrow(user *LibraryUser) []Book {
 	var books []Book
 	doc.Find("table").Each(func(i int, s *goquery.Selection) {
 		style, _ := s.Attr("style")
-		fmt.Println(style)
 		if strings.Contains(style, "border-style") {
 			bookName := strings.Trim(s.Find("a").Text(), " \r\n")
 			token := s.Find("span").Nodes

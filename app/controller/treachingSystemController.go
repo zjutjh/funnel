@@ -5,83 +5,113 @@ import (
 	"funnel/app/errors"
 	"funnel/app/helps"
 	"funnel/app/model"
+	"funnel/app/service"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-var ts = model.TeachingSystem{}
+var ts = service.TeachingSystem{}
 
 func ZFLogin(context *gin.Context) {
-	session := sessions.Default(context)
-	stu := model.ZFUser{
-		Username: context.PostForm("username"),
-		Password: context.PostForm("password")}
-
-	err := ts.Login(&stu)
-
-	if err == errors.ERR_WRONG_PASSWORD {
-		context.Data(200, "application/json", helps.FailResponseJson(errors.WrongPassword, nil))
-	} else if err != nil {
-		context.Data(200, "application/json", helps.FailResponseJson(errors.UnKnown, nil))
+	_, err := ZFLoginHandle(context)
+	if err == errors.ERR_INVALID_ARGS {
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.RequestFailed, nil))
 	}
-
-	ZFSession, _ := json.Marshal(stu)
-	session.Set("ZFSession", ZFSession)
-	_ = session.Save()
-	context.Data(200, "application/json", helps.SuccessResponseJson(nil))
+	if err == nil {
+		helps.ContextDataResponseJson(context, helps.SuccessResponseJson(nil))
+	}
 }
 
 func GetScoreDetail(context *gin.Context) {
-	session := sessions.Default(context)
-	ZFSession := session.Get("ZFSession").([]byte)
-	if ZFSession == nil {
-		context.Data(200, "application/json", helps.FailResponseJson(errors.NotLogin, nil))
-		return
+
+	user, err := ZFTermInfoHandle(context)
+	if err == nil {
+		result, _ := ts.GetScoreDetail(user, context.PostForm("year"), context.PostForm("term"))
+		context.Data(200, "application/json", []byte(result))
 	}
 
-	stu := &model.ZFUser{}
-	_ = json.Unmarshal(ZFSession, stu)
-	result, _ := ts.GetScoreDetail(stu, context.Param("year"), context.Param("term"))
-	context.Data(200, "application/json", []byte(result))
 }
 func GetScore(context *gin.Context) {
-	session := sessions.Default(context)
-	ZFSession := session.Get("ZFSession").([]byte)
-	if ZFSession == nil {
-		context.Data(200, "application/json", helps.FailResponseJson(errors.NotLogin, nil))
-		return
+	user, err := ZFTermInfoHandle(context)
+	if err == nil {
+		result, _ := ts.GetScore(user, context.PostForm("year"), context.PostForm("term"))
+		context.Data(200, "application/json", []byte(result))
 	}
-
-	stu := &model.ZFUser{}
-	_ = json.Unmarshal(ZFSession, stu)
-	result, _ := ts.GetScore(stu, context.Param("year"), context.Param("term"))
-	context.Data(200, "application/json", []byte(result))
 }
 
 func GetClassTable(context *gin.Context) {
-	session := sessions.Default(context)
-	ZFSession := session.Get("ZFSession").([]byte)
-	if ZFSession == nil {
-		context.Data(200, "application/json", helps.FailResponseJson(errors.NotLogin, nil))
-		return
+	user, err := ZFTermInfoHandle(context)
+	if err == nil {
+		result, _ := ts.GetClassTable(user, context.PostForm("year"), context.PostForm("term"))
+		context.Data(200, "application/json", []byte(result))
 	}
-
-	stu := &model.ZFUser{}
-	_ = json.Unmarshal(ZFSession, stu)
-	result, _ := ts.GetClassTable(stu, context.Param("year"), context.Param("term"))
-	context.Data(200, "application/json", []byte(result))
 }
 
 func GetExamInfo(context *gin.Context) {
-	session := sessions.Default(context)
-	ZFSession := session.Get("ZFSession").([]byte)
-	if ZFSession == nil {
-		context.Data(200, "application/json", helps.FailResponseJson(errors.NotLogin, nil))
-		return
+	user, err := ZFTermInfoHandle(context)
+	if err == nil {
+		result, _ := ts.GetExamInfo(user, context.PostForm("year"), context.PostForm("term"))
+		context.Data(200, "application/json", []byte(result))
+	}
+}
+
+func ZFLoginHandle(context *gin.Context) (*model.ZFUser, error) {
+	isValid := helps.CheckPostFormEmpty(
+		context,
+		[]string{"username", "password"},
+	)
+
+	if !isValid {
+		return nil, errors.ERR_INVALID_ARGS
 	}
 
-	stu := &model.ZFUser{}
-	_ = json.Unmarshal(ZFSession, stu)
-	result, _ := ts.GetExamInfo(stu, context.Param("year"), context.Param("term"))
-	context.Data(200, "application/json", []byte(result))
+	user := model.ZFUser{
+		Username: context.PostForm("username"),
+		Password: context.PostForm("password")}
+
+	err := ts.Login(&user)
+	if err == errors.ERR_WRONG_PASSWORD {
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
+		return nil, err
+	}
+	if err != nil {
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+		return nil, err
+	}
+
+	session := sessions.Default(context)
+	ZFSession, _ := json.Marshal(user)
+	session.Set("ZFSession", ZFSession)
+	_ = session.Save()
+	return &user, nil
+}
+
+func ZFTermInfoHandle(context *gin.Context) (*model.ZFUser, error) {
+	isValid := helps.CheckPostFormEmpty(
+		context,
+		[]string{"year", "term"},
+	)
+
+	if !isValid {
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.RequestFailed, nil))
+		return nil, errors.ERR_INVALID_ARGS
+	}
+
+	user, err := helps.CheckSession(context, "ZFSession")
+
+	if err != nil {
+		user, loginErr := ZFLoginHandle(context)
+		if loginErr == nil {
+			return user, nil
+		}
+		if err == errors.ERR_SESSION_NOT_EXIST {
+			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
+		}
+		if err == errors.ERR_SESSION_EXPIRES {
+			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
+		}
+		return nil, err
+
+	}
+	return user, nil
 }

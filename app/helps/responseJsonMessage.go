@@ -2,25 +2,25 @@ package helps
 
 import (
 	"encoding/json"
-	"log"
+	"github.com/gin-gonic/gin"
 )
 import "funnel/app/errors"
 
 type ResponseJsonMessage struct {
-	Code    int `json:"code"`
-	Message string `json:"message"`
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
 
-func SuccessResponseJson(d interface{}) []byte {
-	jsonRes, err := json.Marshal(ResponseJsonMessage{Code: 200, Message: "OK", Data: d})
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	return jsonRes
+func SuccessResponseJson(d interface{}) ResponseJsonMessage {
+	return ResponseJsonMessage{Code: 200, Message: "OK", Data: d}
 }
 
-func FailResponseJson(error errors.ResponseError, d interface{}) []byte {
-	jsonRes, _ := json.Marshal(ResponseJsonMessage{Code: error.Code, Message: error.Message, Data: d})
-	return jsonRes
+func FailResponseJson(error errors.ResponseError, d interface{}) ResponseJsonMessage {
+	return ResponseJsonMessage{Code: error.Code, Message: error.Message, Data: d}
+}
+
+func ContextDataResponseJson(context *gin.Context, response ResponseJsonMessage) {
+	jsonRes, _ := json.Marshal(response)
+	context.Data(response.Code, "application/json", jsonRes)
 }

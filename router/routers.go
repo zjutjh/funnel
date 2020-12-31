@@ -6,30 +6,31 @@ import (
 )
 
 func SetupRouter(r *gin.Engine) *gin.Engine {
-	r.Group("/v2")
+	v2 := r.Group("/v2")
 	{
-		r.Group("/student")
+		student := v2.Group("/student")
 		{
-			r.Group("/zf")
+			zf := student.Group("/zf")
 			{
-				r.POST("/login", controller.ZFLogin)
-				r.GET("/score-info/:year/:term", controller.GetScoreDetail)
-				r.GET("/score/:year/:term", controller.GetScore)
-				r.GET("/class-table/:year/:term", controller.GetClassTable)
-				r.GET("/exam/:username/:year/:term", controller.GetExamInfo)
+				zf.POST("/login", controller.ZFLogin)
+				zf.POST("/score/info", controller.GetScoreDetail)
+				zf.POST("/score", controller.GetScore)
+				zf.POST("/table", controller.GetClassTable)
+				zf.POST("/exam", controller.GetExamInfo)
 			}
-			r.Group("/library")
+			library := student.Group("/library")
 			{
-				r.POST("/library/login", controller.LibraryLogin)
-				r.GET("/borrow/history/:page", controller.LibraryBorrowHistory)
-				r.GET("/borrow/current/:page", controller.LibraryCurrentBorrow)
+				library.POST("/login", controller.LibraryLogin)
+				library.GET("/borrow/history/:page", controller.LibraryBorrowHistory)
+				library.GET("/borrow/current/:page", controller.LibraryCurrentBorrow)
+			}
+			card := student.Group("/card")
+			{
+				card.POST("/login", controller.CardLogin)
+				card.Any("/balance", controller.CardBalance)
+				card.Any("/today", controller.CardToday)
 			}
 		}
-		r.Group("/teacher")
-		{
-
-		}
-
 	}
 
 	return r

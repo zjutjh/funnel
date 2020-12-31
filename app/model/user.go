@@ -15,3 +15,10 @@ type LibraryUser struct {
 	Name     string
 	Session  http.Cookie
 }
+
+type CardUser struct {
+	Username string
+	Password string
+	Name     string
+	Session  http.Cookie
+}

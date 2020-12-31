@@ -16,6 +16,8 @@ require (
 	github.com/onsi/gomega v1.10.3 // indirect
 	github.com/ugorji/go v1.1.11 // indirect
 	golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0 // indirect
+	golang.org/x/net v0.0.0-20201006153459-a7d1128ccaa0
 	golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634 // indirect
+	golang.org/x/text v0.3.3
 	google.golang.org/protobuf v1.25.0 // indirect
 )

@@ -10,46 +10,44 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var system = service.LibrarySystem{}
+var cardSystem = service.CardSystem{}
 
-func LibraryLogin(context *gin.Context) {
-	err := libraryLoginHandle(context)
+func CardLogin(context *gin.Context) {
+	err := cardLoginHandle(context)
 	if err == nil {
 		helps.ContextDataResponseJson(context, helps.SuccessResponseJson(nil))
 	}
 }
 
-func LibraryBorrowHistory(context *gin.Context) {
+func CardBalance(context *gin.Context) {
 	session := sessions.Default(context)
-	libraryJson := session.Get("library").([]byte)
-	if string(libraryJson) == "{}" {
+	cardJson := session.Get("card").([]byte)
+
+	if string(cardJson) == "{}" {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
 		return
 	}
 
-	user := model.LibraryUser{}
-	_ = json.Unmarshal(libraryJson, &user)
-	books := system.GetBorrowHistory(&user)
-
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
+	user := model.CardUser{}
+	_ = json.Unmarshal(cardJson, &user)
+	balance := cardSystem.GetCurrentBalance(&user)
+	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(balance))
 }
-
-func LibraryCurrentBorrow(context *gin.Context) {
+func CardToday(context *gin.Context) {
 	session := sessions.Default(context)
-	libraryJson := session.Get("library").([]byte)
-	if string(libraryJson) == "{}" {
+	cardJson := session.Get("card").([]byte)
+
+	if string(cardJson) == "{}" {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
 		return
 	}
 
-	user := model.LibraryUser{}
-	_ = json.Unmarshal(libraryJson, &user)
-	books := system.GetCurrentBorrow(&user)
-
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
+	user := model.CardUser{}
+	_ = json.Unmarshal(cardJson, &user)
+	balance := cardSystem.GetCardToday(&user)
+	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(balance))
 }
-
-func libraryLoginHandle(context *gin.Context) error {
+func cardLoginHandle(context *gin.Context) error {
 	isValid := helps.CheckPostFormEmpty(
 		context,
 		[]string{"username", "password"},
@@ -60,8 +58,8 @@ func libraryLoginHandle(context *gin.Context) error {
 		return errors.ERR_INVALID_ARGS
 	}
 
-	user := model.LibraryUser{Username: context.PostForm("username"), Password: context.PostForm("password")}
-	err := system.Login(&user)
+	user := model.CardUser{Username: context.PostForm("username"), Password: context.PostForm("password")}
+	err := cardSystem.Login(&user)
 
 	if err == errors.ERR_WRONG_PASSWORD {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
@@ -73,8 +71,8 @@ func libraryLoginHandle(context *gin.Context) error {
 	}
 
 	session := sessions.Default(context)
-	libraryJson, _ := json.Marshal(user)
-	session.Set("library", libraryJson)
+	cardJson, _ := json.Marshal(user)
+	session.Set("card", cardJson)
 	_ = session.Save()
 
 	return nil
