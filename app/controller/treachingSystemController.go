@@ -14,8 +14,9 @@ var ts = service.TeachingSystem{}
 
 func ZFLogin(context *gin.Context) {
 	_, err := ZFLoginHandle(context)
+
 	if err == errors.ERR_INVALID_ARGS {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.RequestFailed, nil))
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
 	}
 	if err == nil {
 		helps.ContextDataResponseJson(context, helps.SuccessResponseJson(nil))
@@ -26,32 +27,57 @@ func GetScoreDetail(context *gin.Context) {
 
 	user, err := ZFTermInfoHandle(context)
 	if err == nil {
-		result, _ := ts.GetScoreDetail(user, context.PostForm("year"), context.PostForm("term"))
-		context.Data(200, "application/json", []byte(result))
+		result, err := ts.GetScoreDetail(user, context.PostForm("year"), context.PostForm("term"))
+		if err == nil {
+			var f interface{}
+			_ = json.Unmarshal([]byte(result), &f)
+			helps.ContextDataResponseJson(context, helps.SuccessResponseJson(f))
+			return
+		}
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+
 	}
 
 }
 func GetScore(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err == nil {
-		result, _ := ts.GetScore(user, context.PostForm("year"), context.PostForm("term"))
-		context.Data(200, "application/json", []byte(result))
+		result, err := ts.GetScore(user, context.PostForm("year"), context.PostForm("term"))
+		if err == nil {
+			var f interface{}
+			_ = json.Unmarshal([]byte(result), &f)
+			helps.ContextDataResponseJson(context, helps.SuccessResponseJson(f))
+			return
+		}
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
 	}
 }
 
 func GetClassTable(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err == nil {
-		result, _ := ts.GetClassTable(user, context.PostForm("year"), context.PostForm("term"))
-		context.Data(200, "application/json", []byte(result))
+		result, err := ts.GetClassTable(user, context.PostForm("year"), context.PostForm("term"))
+		if err == nil {
+			var f interface{}
+			_ = json.Unmarshal([]byte(result), &f)
+			helps.ContextDataResponseJson(context, helps.SuccessResponseJson(f))
+			return
+		}
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
 	}
 }
 
 func GetExamInfo(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err == nil {
-		result, _ := ts.GetExamInfo(user, context.PostForm("year"), context.PostForm("term"))
-		context.Data(200, "application/json", []byte(result))
+		result, err := ts.GetExamInfo(user, context.PostForm("year"), context.PostForm("term"))
+		if err == nil {
+			var f interface{}
+			_ = json.Unmarshal([]byte(result), &f)
+			helps.ContextDataResponseJson(context, helps.SuccessResponseJson(f))
+			return
+		}
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
 	}
 }
 
@@ -70,6 +96,7 @@ func ZFLoginHandle(context *gin.Context) (*model.ZFUser, error) {
 		Password: context.PostForm("password")}
 
 	err := ts.Login(&user)
+
 	if err == errors.ERR_WRONG_PASSWORD {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
 		return nil, err
@@ -93,11 +120,11 @@ func ZFTermInfoHandle(context *gin.Context) (*model.ZFUser, error) {
 	)
 
 	if !isValid {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.RequestFailed, nil))
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
 		return nil, errors.ERR_INVALID_ARGS
 	}
 
-	user, err := helps.CheckSession(context, "ZFSession")
+	user, err := helps.CheckZFSession(context, "ZFSession")
 
 	if err != nil {
 		user, loginErr := ZFLoginHandle(context)

@@ -6,30 +6,29 @@ import (
 )
 
 func SetupRouter(r *gin.Engine) *gin.Engine {
-	v2 := r.Group("/v2")
+
+	student := r.Group("/student")
 	{
-		student := v2.Group("/student")
+		zf := student.Group("/zf")
 		{
-			zf := student.Group("/zf")
-			{
-				zf.POST("/login", controller.ZFLogin)
-				zf.POST("/score/info", controller.GetScoreDetail)
-				zf.POST("/score", controller.GetScore)
-				zf.POST("/table", controller.GetClassTable)
-				zf.POST("/exam", controller.GetExamInfo)
-			}
-			library := student.Group("/library")
-			{
-				library.POST("/login", controller.LibraryLogin)
-				library.GET("/borrow/history/:page", controller.LibraryBorrowHistory)
-				library.GET("/borrow/current/:page", controller.LibraryCurrentBorrow)
-			}
-			card := student.Group("/card")
-			{
-				card.POST("/login", controller.CardLogin)
-				card.Any("/balance", controller.CardBalance)
-				card.Any("/today", controller.CardToday)
-			}
+			zf.POST("/login", controller.ZFLogin)
+			zf.POST("/score/info", controller.GetScoreDetail)
+			zf.POST("/score", controller.GetScore)
+			zf.POST("/table", controller.GetClassTable)
+			zf.POST("/exam", controller.GetExamInfo)
+		}
+		library := student.Group("/library")
+		{
+			library.POST("/login", controller.LibraryLogin)
+			library.GET("/borrow/history/:page", controller.LibraryBorrowHistory)
+			library.GET("/borrow/current/:page", controller.LibraryCurrentBorrow)
+		}
+		card := student.Group("/card")
+		{
+			card.POST("/login", controller.CardLogin)
+			card.Any("/balance", controller.CardBalance)
+			card.Any("/today", controller.CardToday)
+			card.Any("/history", controller.CardHistory)
 		}
 	}
 

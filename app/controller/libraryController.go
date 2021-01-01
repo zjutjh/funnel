@@ -13,43 +13,51 @@ import (
 var system = service.LibrarySystem{}
 
 func LibraryLogin(context *gin.Context) {
-	err := libraryLoginHandle(context)
+	_, err := libraryLoginHandle(context)
 	if err == nil {
 		helps.ContextDataResponseJson(context, helps.SuccessResponseJson(nil))
 	}
 }
 
 func LibraryBorrowHistory(context *gin.Context) {
-	session := sessions.Default(context)
-	libraryJson := session.Get("library").([]byte)
-	if string(libraryJson) == "{}" {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
-		return
+	user, err := helps.CheckLibrarySession(context, "library")
+	if err != nil {
+		userp, loginerr := libraryLoginHandle(context)
+		if loginerr != nil && err == errors.ERR_SESSION_NOT_EXIST {
+			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
+			return
+		}
+		if loginerr != nil && err == errors.ERR_SESSION_EXPIRES {
+			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
+			return
+		}
+		user = userp
 	}
 
-	user := model.LibraryUser{}
-	_ = json.Unmarshal(libraryJson, &user)
-	books := system.GetBorrowHistory(&user)
-
+	books := system.GetBorrowHistory(user)
 	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
 }
 
 func LibraryCurrentBorrow(context *gin.Context) {
-	session := sessions.Default(context)
-	libraryJson := session.Get("library").([]byte)
-	if string(libraryJson) == "{}" {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
-		return
+	user, err := helps.CheckLibrarySession(context, "library")
+	if err != nil {
+		userp, loginerr := libraryLoginHandle(context)
+		if loginerr != nil && err == errors.ERR_SESSION_NOT_EXIST {
+			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
+			return
+		}
+		if loginerr != nil && err == errors.ERR_SESSION_EXPIRES {
+			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
+			return
+		}
+		user = userp
 	}
 
-	user := model.LibraryUser{}
-	_ = json.Unmarshal(libraryJson, &user)
-	books := system.GetCurrentBorrow(&user)
-
+	books := system.GetCurrentBorrow(user)
 	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
 }
 
-func libraryLoginHandle(context *gin.Context) error {
+func libraryLoginHandle(context *gin.Context) (*model.LibraryUser, error) {
 	isValid := helps.CheckPostFormEmpty(
 		context,
 		[]string{"username", "password"},
@@ -57,7 +65,7 @@ func libraryLoginHandle(context *gin.Context) error {
 
 	if !isValid {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.RequestFailed, nil))
-		return errors.ERR_INVALID_ARGS
+		return nil, errors.ERR_INVALID_ARGS
 	}
 
 	user := model.LibraryUser{Username: context.PostForm("username"), Password: context.PostForm("password")}
@@ -65,11 +73,11 @@ func libraryLoginHandle(context *gin.Context) error {
 
 	if err == errors.ERR_WRONG_PASSWORD {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
-		return err
+		return nil, err
 	}
 	if err != nil {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
-		return err
+		return nil, err
 	}
 
 	session := sessions.Default(context)
@@ -77,5 +85,5 @@ func libraryLoginHandle(context *gin.Context) error {
 	session.Set("library", libraryJson)
 	_ = session.Save()
 
-	return nil
+	return &user, nil
 }

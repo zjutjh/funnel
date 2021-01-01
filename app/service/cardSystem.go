@@ -115,6 +115,67 @@ func (t *CardSystem) GetCardToday(user *model.CardUser) []CardTransaction {
 		log.Fatal(err)
 	}
 	var cardTransactions []CardTransaction
+	cardTransactions = append(cardTransactions)
+	doc.Find("#dgShow").Find("tr").Next().Each(func(i int, selection *goquery.Selection) {
+		nodes := selection.Find("td").Nodes
+		cardTransaction := CardTransaction{
+			nodes[0].FirstChild.Data,
+			nodes[1].FirstChild.Data,
+			nodes[2].FirstChild.Data,
+			nodes[3].FirstChild.Data,
+			nodes[4].FirstChild.Data,
+			nodes[5].FirstChild.Data,
+			nodes[6].FirstChild.Data,
+			nodes[7].FirstChild.Data,
+			nodes[8].FirstChild.Data,
+			nodes[9].FirstChild.Data,
+			nodes[10].FirstChild.Data}
+
+		cardTransactions = append(cardTransactions, cardTransaction)
+	})
+	return cardTransactions
+}
+func (t *CardSystem) GetCardHistory(user *model.CardUser, year string, month string) []CardTransaction {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
+		Transport:     transport,
+	}
+
+	request, _ := http.NewRequest("GET", apis.CardHistoryQuery, nil)
+	request.AddCookie(&user.Session)
+	response, _ := client.Do(request)
+	doc, _ := goquery.NewDocumentFromReader(response.Body)
+	loginData := url.Values{
+		"__VIEWSTATE":          {doc.Find("#__VIEWSTATE").AttrOr("value", "")},
+		"__VIEWSTATEGENERATOR": {doc.Find("#__VIEWSTATEGENERATOR").AttrOr("value", "")},
+		"ddlYear":              {year},
+		"txtMonth":             {month},
+		"ddlMonth":             {month},
+		"ImageButton1.x":       {"48"},
+		"ImageButton1.y":       {"8"}}
+
+	request, _ = http.NewRequest("POST", apis.CardHistoryQuery, strings.NewReader(loginData.Encode()))
+
+	request.AddCookie(&user.Session)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response, _ = client.Do(request)
+	utf8Body, err := helps.DecodeHTMLBody(response.Body, "GBK")
+	doc, err = goquery.NewDocumentFromReader(utf8Body)
+
+	request, _ = http.NewRequest("GET", apis.CardHistory, nil)
+	request.AddCookie(&user.Session)
+	response, _ = client.Do(request)
+	utf8Body, err = helps.DecodeHTMLBody(response.Body, "GBK")
+	doc, err = goquery.NewDocumentFromReader(utf8Body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	var cardTransactions []CardTransaction
+	cardTransactions = append(cardTransactions)
 	doc.Find("#dgShow").Find("tr").Next().Each(func(i int, selection *goquery.Selection) {
 		nodes := selection.Find("td").Nodes
 		cardTransaction := CardTransaction{
