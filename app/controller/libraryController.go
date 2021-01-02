@@ -1,89 +1,73 @@
 package controller
 
 import (
-	"encoding/json"
 	"funnel/app/errors"
 	"funnel/app/helps"
-	"funnel/app/model"
 	"funnel/app/service"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-var system = service.LibrarySystem{}
+var librarySystem = service.LibrarySystem{}
 
-func LibraryLogin(context *gin.Context) {
-	_, err := libraryLoginHandle(context)
-	if err == nil {
-		helps.ContextDataResponseJson(context, helps.SuccessResponseJson(nil))
-	}
-}
-
+// @Summary 图书馆历史借书记录
+// @Description 图书馆借书记录（暂时只支持10本）
+// @Tags 图书馆
+// @Produce  json
+// @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
+// @Failure 400 json  {"code":400,"data":null,"msg":""}
+// @Router /student/library/history/0 [get]
 func LibraryBorrowHistory(context *gin.Context) {
-	user, err := helps.CheckLibrarySession(context, "library")
-	if err != nil {
-		userp, loginerr := libraryLoginHandle(context)
-		if loginerr != nil && err == errors.ERR_SESSION_NOT_EXIST {
-			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
-			return
-		}
-		if loginerr != nil && err == errors.ERR_SESSION_EXPIRES {
-			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
-			return
-		}
-		user = userp
-	}
-
-	books := system.GetBorrowHistory(user)
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
-}
-
-func LibraryCurrentBorrow(context *gin.Context) {
-	user, err := helps.CheckLibrarySession(context, "library")
-	if err != nil {
-		userp, loginerr := libraryLoginHandle(context)
-		if loginerr != nil && err == errors.ERR_SESSION_NOT_EXIST {
-			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
-			return
-		}
-		if loginerr != nil && err == errors.ERR_SESSION_EXPIRES {
-			helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.NotLogin, nil))
-			return
-		}
-		user = userp
-	}
-
-	books := system.GetCurrentBorrow(user)
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
-}
-
-func libraryLoginHandle(context *gin.Context) (*model.LibraryUser, error) {
 	isValid := helps.CheckPostFormEmpty(
 		context,
 		[]string{"username", "password"},
 	)
 
 	if !isValid {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.RequestFailed, nil))
-		return nil, errors.ERR_INVALID_ARGS
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
+		return
 	}
 
-	user := model.LibraryUser{Username: context.PostForm("username"), Password: context.PostForm("password")}
-	err := system.Login(&user)
-
+	user, err := librarySystem.GetUser(context.PostForm("username"), context.PostForm("password"))
 	if err == errors.ERR_WRONG_PASSWORD {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
-		return nil, err
+		return
 	}
 	if err != nil {
 		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
-		return nil, err
+		return
+	}
+	books := librarySystem.GetBorrowHistory(user)
+	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
+}
+
+// @Summary 图书馆当前借书记录
+// @Description 图书馆当前借书记录
+// @Tags 图书馆
+// @Produce  json
+// @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
+// @Failure 400 json  {"code":400,"data":null,"msg":""}
+// @Router /student/library/current/0 [get]
+func LibraryCurrentBorrow(context *gin.Context) {
+	isValid := helps.CheckPostFormEmpty(
+		context,
+		[]string{"username", "password"},
+	)
+
+	if !isValid {
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
+		return
 	}
 
-	session := sessions.Default(context)
-	libraryJson, _ := json.Marshal(user)
-	session.Set("library", libraryJson)
-	_ = session.Save()
+	user, err := librarySystem.GetUser(context.PostForm("username"), context.PostForm("password"))
+	if err == errors.ERR_WRONG_PASSWORD {
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
+		return
+	}
+	if err != nil {
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+		return
+	}
 
-	return &user, nil
+	books := librarySystem.GetCurrentBorrow(user)
+	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
 }

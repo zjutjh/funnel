@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/json"
+	funnel "funnel/app"
 	"funnel/app/apis"
 	"funnel/app/errors"
 	"funnel/app/model"
@@ -9,12 +11,12 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type LibrarySystem struct {
-	RootUrl       string
-	ClassTableUrl string
 }
+
 type ReaderInfo struct {
 	CurrentBorrowedCount string
 	ExtendedCount        string
@@ -29,31 +31,7 @@ type Book struct {
 	IsExtended    string
 }
 
-func (t *LibrarySystem) Login(user *model.LibraryUser) error {
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-	}
-
-	url0 := apis.LibraryLogin
-	loginData := url.Values{
-		"__VIEWSTATE":          {apis.Library__VIEWSTATE},
-		"__VIEWSTATEGENERATOR": {apis.Library__VIEWSTATEGENERATOR},
-		"__EVENTVALIDATION":    {apis.Library__EVENTVALIDATION},
-		"TextBox1":             {user.Username},
-		"TextBox2":             {user.Password},
-		"ImageButton1.x":       {"29"},
-		"ImageButton1.y":       {"8"}}
-	response, _ := client.PostForm(url0, loginData)
-
-	if len(response.Cookies()) == 0 {
-		return errors.ERR_WRONG_PASSWORD
-	}
-	session := response.Cookies()[0]
-	user.Session = *session
-	return nil
-}
-
-func (t *LibrarySystem) GetBorrowHistory(user *model.LibraryUser) []Book {
+func (t *LibrarySystem) GetBorrowHistory(user *model.User) []Book {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
@@ -80,7 +58,7 @@ func (t *LibrarySystem) GetBorrowHistory(user *model.LibraryUser) []Book {
 	return books
 }
 
-func (t *LibrarySystem) GetCurrentBorrow(user *model.LibraryUser) []Book {
+func (t *LibrarySystem) GetCurrentBorrow(user *model.User) []Book {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 	}
@@ -118,4 +96,39 @@ func (t *LibrarySystem) GetCurrentBorrow(user *model.LibraryUser) []Book {
 
 	})
 	return books
+}
+
+func (t *LibrarySystem) login(username string, password string) (*model.User, error) {
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
+	}
+
+	url0 := apis.LibraryLogin
+	loginData := url.Values{
+		"__VIEWSTATE":          {apis.Library__VIEWSTATE},
+		"__VIEWSTATEGENERATOR": {apis.Library__VIEWSTATEGENERATOR},
+		"__EVENTVALIDATION":    {apis.Library__EVENTVALIDATION},
+		"TextBox1":             {username},
+		"TextBox2":             {password},
+		"ImageButton1.x":       {"29"},
+		"ImageButton1.y":       {"8"}}
+	response, _ := client.PostForm(url0, loginData)
+
+	if len(response.Cookies()) == 0 {
+		return nil, errors.ERR_WRONG_PASSWORD
+	}
+
+	cookie := *response.Cookies()[0]
+	user := model.User{Username: username, Password: password, Session: cookie}
+	userJson, _ := json.Marshal(user)
+	funnel.Redis.Set(LibraryPrefix+username, string(userJson), cookie.Expires.Sub(time.Now().Add(time.Minute*5)))
+	return &user, nil
+}
+
+func (t *LibrarySystem) GetUser(username string, password string) (*model.User, error) {
+	user, err := GetUser(LibraryPrefix, username)
+	if err != nil {
+		return t.login(username, password)
+	}
+	return user, err
 }

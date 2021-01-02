@@ -1,0 +1,344 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/student/card/balance": {
+            "get": {
+                "description": "校园卡余额查询",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "校园卡"
+                ],
+                "summary": "校园卡余额查询",
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":123.4,\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/card/history": {
+            "post": {
+                "description": "校园卡历史查询",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "校园卡"
+                ],
+                "summary": "校园卡历史查询",
+                "parameters": [
+                    {
+                        "description": "年份",
+                        "name": "year",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "月份",
+                        "name": "month",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":[{...}],\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/card/today": {
+            "get": {
+                "description": "校园卡今日消费查询",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "校园卡"
+                ],
+                "summary": "校园卡今日消费查询",
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":[{}],\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/library/current/0": {
+            "get": {
+                "description": "图书馆当前借书记录",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "图书馆"
+                ],
+                "summary": "图书馆当前借书记录",
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":[{...}],\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/library/history/0": {
+            "get": {
+                "description": "图书馆借书记录（暂时只支持10本）",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "图书馆"
+                ],
+                "summary": "图书馆历史借书记录",
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":[{...}],\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/zf/exam": {
+            "post": {
+                "description": "正方教务考试信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "正方"
+                ],
+                "summary": "正方教务考试信息",
+                "parameters": [
+                    {
+                        "description": "学期",
+                        "name": "term",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "年份",
+                        "name": "year",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":{object},\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/zf/score": {
+            "post": {
+                "description": "正方教务课表",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "正方"
+                ],
+                "summary": "正方教务课表",
+                "parameters": [
+                    {
+                        "description": "学期",
+                        "name": "term",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "年份",
+                        "name": "year",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":{object},\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/zf/score/info": {
+            "post": {
+                "description": "正方教务成绩",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "正方"
+                ],
+                "summary": "正方教务成绩",
+                "parameters": [
+                    {
+                        "description": "学期",
+                        "name": "term",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "年份",
+                        "name": "year",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":{object},\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,222 @@
+info:
+  contact: {}
+paths:
+  /student/card/balance:
+    get:
+      description: 校园卡余额查询
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":200,"data":123.4,"msg":"OK"}
+          schema:
+            type: json
+        "400":
+          description: code":400,"data":null,"msg":""}
+          schema:
+            type: json
+      summary: 校园卡余额查询
+      tags:
+      - 校园卡
+  /student/card/history:
+    post:
+      description: 校园卡历史查询
+      parameters:
+      - description: 年份
+        in: body
+        name: year
+        required: true
+        schema:
+          type: string
+      - description: 月份
+        in: body
+        name: month
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":200,"data":[{...}],"msg":"OK"}
+          schema:
+            type: json
+        "400":
+          description: code":400,"data":null,"msg":""}
+          schema:
+            type: json
+      summary: 校园卡历史查询
+      tags:
+      - 校园卡
+  /student/card/today:
+    get:
+      description: 校园卡今日消费查询
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":200,"data":[{}],"msg":"OK"}
+          schema:
+            type: json
+        "400":
+          description: code":400,"data":null,"msg":""}
+          schema:
+            type: json
+      summary: 校园卡今日消费查询
+      tags:
+      - 校园卡
+  /student/library/current/0:
+    get:
+      description: 图书馆当前借书记录
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":200,"data":[{...}],"msg":"OK"}
+          schema:
+            type: json
+        "400":
+          description: code":400,"data":null,"msg":""}
+          schema:
+            type: json
+      summary: 图书馆当前借书记录
+      tags:
+      - 图书馆
+  /student/library/history/0:
+    get:
+      description: 图书馆借书记录（暂时只支持10本）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":200,"data":[{...}],"msg":"OK"}
+          schema:
+            type: json
+        "400":
+          description: code":400,"data":null,"msg":""}
+          schema:
+            type: json
+      summary: 图书馆历史借书记录
+      tags:
+      - 图书馆
+  /student/zf/exam:
+    post:
+      description: 正方教务考试信息
+      parameters:
+      - description: 学期
+        in: body
+        name: term
+        required: true
+        schema:
+          type: string
+      - description: 年份
+        in: body
+        name: year
+        required: true
+        schema:
+          type: string
+      - description: 用户名
+        in: body
+        name: username
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":200,"data":{object},"msg":"OK"}
+          schema:
+            type: json
+        "400":
+          description: code":400,"data":null,"msg":""}
+          schema:
+            type: json
+      summary: 正方教务考试信息
+      tags:
+      - 正方
+  /student/zf/score:
+    post:
+      description: 正方教务课表
+      parameters:
+      - description: 学期
+        in: body
+        name: term
+        required: true
+        schema:
+          type: string
+      - description: 年份
+        in: body
+        name: year
+        required: true
+        schema:
+          type: string
+      - description: 用户名
+        in: body
+        name: username
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":200,"data":{object},"msg":"OK"}
+          schema:
+            type: json
+        "400":
+          description: code":400,"data":null,"msg":""}
+          schema:
+            type: json
+      summary: 正方教务课表
+      tags:
+      - 正方
+  /student/zf/score/info:
+    post:
+      description: 正方教务成绩
+      parameters:
+      - description: 学期
+        in: body
+        name: term
+        required: true
+        schema:
+          type: string
+      - description: 年份
+        in: body
+        name: year
+        required: true
+        schema:
+          type: string
+      - description: 用户名
+        in: body
+        name: username
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code":200,"data":{object},"msg":"OK"}
+          schema:
+            type: json
+        "400":
+          description: code":400,"data":null,"msg":""}
+          schema:
+            type: json
+      summary: 正方教务成绩
+      tags:
+      - 正方
+swagger: "2.0"

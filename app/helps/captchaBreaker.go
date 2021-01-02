@@ -3,6 +3,7 @@ package helps
 import (
 	"encoding/base64"
 	"encoding/json"
+	"funnel/app/apis"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -19,20 +20,19 @@ func BreakCaptcha(s []byte) (string, error) {
 	}
 
 	captchaImageBase64 := base64.StdEncoding.EncodeToString(s)
-	url3 := "http://172.16.32.50/yzm"
-	response, err := client.PostForm(url3,
+	response, err := client.PostForm(apis.CAPTCHA_BREAKER_URL,
 		url.Values{"img_base64": {"data:image/jpeg;base64," + captchaImageBase64}})
 
-	if err != nil{
+	if err != nil {
 		return "", err
 	}
 
 	captcha, err := ioutil.ReadAll(response.Body)
 
-	if err != nil{
+	if err != nil {
 		return "", err
 	}
-	
+
 	captchaRes := &captchaBreakerServerResponse{}
 	err = json.Unmarshal(captcha, captchaRes)
 	return captchaRes.Data, err

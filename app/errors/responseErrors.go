@@ -12,6 +12,7 @@ func (r ResponseError) Error() string {
 var OK = ResponseError{200, "OK"}
 var UnKnown = ResponseError{500, "未知错误"}
 var RequestFailed = ResponseError{500, "请求错误"}
+var CaptchaFailed = ResponseError{500, "验证码错误"}
 var InvalidArgs = ResponseError{400, "参数错误"}
 
 var NotLogin = ResponseError{403, "未登录"}

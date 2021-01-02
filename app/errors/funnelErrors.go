@@ -16,7 +16,7 @@ var ERR_ = errors.New("unknown login error")
 var ERR_REQUEST_FAIL = errors.New("timeout")
 
 var ERR_JSON_DESER = errors.New("ERR_JSON_DESER")
-
+var ERR_WRONG_Captcha = errors.New("ERR_WRONG_Captcha")
 var ERR_INVALID_ARGS = errors.New("invalid args")
 var ERR_SESSION_NOT_EXIST = errors.New("ERR_SESSION_NOT_EXIST")
 var ERR_SESSION_EXPIRES = errors.New("ERR_SESSION_EXPIRES")
