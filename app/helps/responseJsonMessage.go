@@ -17,7 +17,7 @@ func SuccessResponseJson(d interface{}) ResponseJsonMessage {
 }
 
 func FailResponseJson(error errors.ResponseError, d interface{}) ResponseJsonMessage {
-	return ResponseJsonMessage{Code: 200, Message: error.Message, Data: d}
+	return ResponseJsonMessage{Code: error.Code, Message: error.Message, Data: d}
 }
 
 func ContextDataResponseJson(context *gin.Context, response ResponseJsonMessage) {
