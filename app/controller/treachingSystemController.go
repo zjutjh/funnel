@@ -19,8 +19,8 @@ var ts = service.TeachingSystem{}
 // @Produce  json
 // @Param term body string true "学期"
 // @Param year body string true "年份"
-// @Param username body string false "用户名"
-// @Param password body string false "密码"
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/zf/score/info [post]
@@ -44,8 +44,8 @@ func GetScoreDetail(context *gin.Context) {
 // @Produce  json
 // @Param term body string true "学期"
 // @Param year body string true "年份"
-// @Param username body string false "用户名"
-// @Param password body string false "密码"
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/zf/score/info [post]
@@ -69,8 +69,8 @@ func GetScore(context *gin.Context) {
 // @Produce  json
 // @Param term body string true "学期"
 // @Param year body string true "年份"
-// @Param username body string false "用户名"
-// @Param password body string false "密码"
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/zf/score [post]
@@ -94,8 +94,8 @@ func GetClassTable(context *gin.Context) {
 // @Produce  json
 // @Param term body string true "学期"
 // @Param year body string true "年份"
-// @Param username body string false "用户名"
-// @Param password body string false "密码"
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/zf/exam [post]

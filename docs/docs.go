@@ -25,7 +25,7 @@ var doc = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/student/card/balance": {
-            "get": {
+            "post": {
                 "description": "校园卡余额查询",
                 "produces": [
                     "application/json"
@@ -34,6 +34,26 @@ var doc = `{
                     "校园卡"
                 ],
                 "summary": "校园卡余额查询",
+                "parameters": [
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "code\":200,\"data\":123.4,\"msg\":\"OK\"}",
@@ -61,6 +81,24 @@ var doc = `{
                 ],
                 "summary": "校园卡历史查询",
                 "parameters": [
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
                     {
                         "description": "年份",
                         "name": "year",
@@ -97,7 +135,7 @@ var doc = `{
             }
         },
         "/student/card/today": {
-            "get": {
+            "post": {
                 "description": "校园卡今日消费查询",
                 "produces": [
                     "application/json"
@@ -106,6 +144,26 @@ var doc = `{
                     "校园卡"
                 ],
                 "summary": "校园卡今日消费查询",
+                "parameters": [
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "code\":200,\"data\":[{}],\"msg\":\"OK\"}",
@@ -123,7 +181,7 @@ var doc = `{
             }
         },
         "/student/library/current/0": {
-            "get": {
+            "post": {
                 "description": "图书馆当前借书记录",
                 "produces": [
                     "application/json"
@@ -132,6 +190,26 @@ var doc = `{
                     "图书馆"
                 ],
                 "summary": "图书馆当前借书记录",
+                "parameters": [
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "code\":200,\"data\":[{...}],\"msg\":\"OK\"}",
@@ -149,7 +227,7 @@ var doc = `{
             }
         },
         "/student/library/history/0": {
-            "get": {
+            "post": {
                 "description": "图书馆借书记录（暂时只支持10本）",
                 "produces": [
                     "application/json"
@@ -158,6 +236,26 @@ var doc = `{
                     "图书馆"
                 ],
                 "summary": "图书馆历史借书记录",
+                "parameters": [
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "code\":200,\"data\":[{...}],\"msg\":\"OK\"}",
@@ -207,6 +305,7 @@ var doc = `{
                         "description": "用户名",
                         "name": "username",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
@@ -215,6 +314,7 @@ var doc = `{
                         "description": "密码",
                         "name": "password",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
@@ -269,6 +369,7 @@ var doc = `{
                         "description": "用户名",
                         "name": "username",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
@@ -277,6 +378,7 @@ var doc = `{
                         "description": "密码",
                         "name": "password",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
@@ -331,6 +433,7 @@ var doc = `{
                         "description": "用户名",
                         "name": "username",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
@@ -339,6 +442,7 @@ var doc = `{
                         "description": "密码",
                         "name": "password",
                         "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }

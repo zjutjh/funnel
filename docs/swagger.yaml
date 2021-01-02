@@ -2,8 +2,21 @@ info:
   contact: {}
 paths:
   /student/card/balance:
-    get:
+    post:
       description: 校园卡余额查询
+      parameters:
+      - description: 用户名
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -22,6 +35,18 @@ paths:
     post:
       description: 校园卡历史查询
       parameters:
+      - description: 用户名
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
       - description: 年份
         in: body
         name: year
@@ -49,8 +74,21 @@ paths:
       tags:
       - 校园卡
   /student/card/today:
-    get:
+    post:
       description: 校园卡今日消费查询
+      parameters:
+      - description: 用户名
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -66,8 +104,21 @@ paths:
       tags:
       - 校园卡
   /student/library/current/0:
-    get:
+    post:
       description: 图书馆当前借书记录
+      parameters:
+      - description: 用户名
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -83,8 +134,21 @@ paths:
       tags:
       - 图书馆
   /student/library/history/0:
-    get:
+    post:
       description: 图书馆借书记录（暂时只支持10本）
+      parameters:
+      - description: 用户名
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: 密码
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -118,11 +182,13 @@ paths:
       - description: 用户名
         in: body
         name: username
+        required: true
         schema:
           type: string
       - description: 密码
         in: body
         name: password
+        required: true
         schema:
           type: string
       produces:
@@ -158,11 +224,13 @@ paths:
       - description: 用户名
         in: body
         name: username
+        required: true
         schema:
           type: string
       - description: 密码
         in: body
         name: password
+        required: true
         schema:
           type: string
       produces:
@@ -198,11 +266,13 @@ paths:
       - description: 用户名
         in: body
         name: username
+        required: true
         schema:
           type: string
       - description: 密码
         in: body
         name: password
+        required: true
         schema:
           type: string
       produces:

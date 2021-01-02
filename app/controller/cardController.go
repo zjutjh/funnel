@@ -13,9 +13,11 @@ var cardSystem = service.CardSystem{}
 // @Description 校园卡余额查询
 // @Tags 校园卡
 // @Produce  json
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":123.4,"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/card/balance [get]
+// @Router /student/card/balance [post]
 func CardBalance(context *gin.Context) {
 	isValid := helps.CheckPostFormEmpty(
 		context,
@@ -45,9 +47,11 @@ func CardBalance(context *gin.Context) {
 // @Description 校园卡今日消费查询
 // @Tags 校园卡
 // @Produce  json
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":[{}],"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/card/today [get]
+// @Router /student/card/today [post]
 func CardToday(context *gin.Context) {
 	isValid := helps.CheckPostFormEmpty(
 		context,
@@ -78,6 +82,8 @@ func CardToday(context *gin.Context) {
 // @Description 校园卡历史查询
 // @Tags 校园卡
 // @Produce  json
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Param year body string true "年份"
 // @Param month body string true "月份"
 // @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}

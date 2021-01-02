@@ -13,9 +13,11 @@ var librarySystem = service.LibrarySystem{}
 // @Description 图书馆借书记录（暂时只支持10本）
 // @Tags 图书馆
 // @Produce  json
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/library/history/0 [get]
+// @Router /student/library/history/0 [post]
 func LibraryBorrowHistory(context *gin.Context) {
 	isValid := helps.CheckPostFormEmpty(
 		context,
@@ -44,9 +46,11 @@ func LibraryBorrowHistory(context *gin.Context) {
 // @Description 图书馆当前借书记录
 // @Tags 图书馆
 // @Produce  json
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/library/current/0 [get]
+// @Router /student/library/current/0 [post]
 func LibraryCurrentBorrow(context *gin.Context) {
 	isValid := helps.CheckPostFormEmpty(
 		context,
