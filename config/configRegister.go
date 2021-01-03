@@ -15,6 +15,7 @@ func init() {
 
 func SetupConfigs(r *gin.Engine) {
 	log.Print("Setup Configs....")
+	setupRecover()
 	setupSession(r)
 	log.Print("Setup Configs Finish....")
 }

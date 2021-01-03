@@ -1,8 +1,6 @@
 package service
 
 import (
-	"encoding/json"
-	funnel "funnel/app"
 	"funnel/app/apis"
 	"funnel/app/errors"
 	"funnel/app/model"
@@ -11,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type LibrarySystem struct {
@@ -117,16 +114,12 @@ func (t *LibrarySystem) login(username string, password string) (*model.User, er
 	if len(response.Cookies()) == 0 {
 		return nil, errors.ERR_WRONG_PASSWORD
 	}
-
-	cookie := *response.Cookies()[0]
-	user := model.User{Username: username, Password: password, Session: cookie}
-	userJson, _ := json.Marshal(user)
-	funnel.Redis.Set(LibraryPrefix+username, string(userJson), cookie.Expires.Sub(time.Now().Add(time.Minute*5)))
-	return &user, nil
+	cookie := response.Cookies()[0]
+	return SetUser(LibraryPrefix, username, password, cookie)
 }
 
 func (t *LibrarySystem) GetUser(username string, password string) (*model.User, error) {
-	user, err := GetUser(LibraryPrefix, username)
+	user, err := GetUser(LibraryPrefix, username, password)
 	if err != nil {
 		return t.login(username, password)
 	}

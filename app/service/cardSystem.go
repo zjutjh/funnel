@@ -2,9 +2,7 @@ package service
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	funnel "funnel/app"
 	"funnel/app/apis"
 	"funnel/app/errors"
 	"funnel/app/helps"
@@ -14,7 +12,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type CardSystem struct {
@@ -188,15 +185,12 @@ func (t *CardSystem) login(username string, password string) (*model.User, error
 		return nil, errors.ERR_WRONG_PASSWORD
 	}
 
-	cookie := *SSIONID
-	user := model.User{Username: username, Password: password, Session: cookie}
-	userJson, _ := json.Marshal(user)
-	funnel.Redis.Set(CardPrefix+username, string(userJson), cookie.Expires.Sub(time.Now().Add(time.Minute*5)))
-	return &user, nil
+	cookie := SSIONID
+	return SetUser(CardPrefix, username, password, cookie)
 }
 
 func (t *CardSystem) GetUser(username string, password string) (*model.User, error) {
-	user, err := GetUser(CardPrefix, username)
+	user, err := GetUser(CardPrefix, username, password)
 	if err != nil {
 		fmt.Println(err.Error())
 		return t.login(username, password)

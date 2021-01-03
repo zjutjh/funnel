@@ -1,8 +1,6 @@
 package service
 
 import (
-	"encoding/json"
-	funnel "funnel/app"
 	"funnel/app/apis"
 	"funnel/app/errors"
 	"funnel/app/helps"
@@ -11,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 type TeachingSystem struct {
@@ -97,14 +94,11 @@ func (t *TeachingSystem) login(username string, password string) (*model.User, e
 	if cookie == nil {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
-	user := model.User{Username: username, Password: password, Session: *cookie}
-	userJson, _ := json.Marshal(user)
-	funnel.Redis.Set(ZFPrefix+username, string(userJson), time.Minute*5)
-	return &user, nil
+	return SetUser(ZFPrefix, username, password, cookie)
 }
 
 func (t *TeachingSystem) GetUser(username string, password string) (*model.User, error) {
-	user, err := GetUser(ZFPrefix, username)
+	user, err := GetUser(ZFPrefix, username, password)
 	if err != nil {
 		return t.login(username, password)
 	}
