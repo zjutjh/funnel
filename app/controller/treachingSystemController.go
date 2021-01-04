@@ -91,6 +91,27 @@ func GetClassTable(context *gin.Context) {
 // @Description 正方教务考试信息
 // @Tags 正方
 // @Produce  json
+// @Param username body string true "用户名"
+// @Param password body string true "密码"
+// @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
+// @Failure 400 json  {"code":400,"data":null,"msg":""}
+// @Router /student/zf/program [post]
+func GetProgInfo(context *gin.Context) {
+	user, err := ZFTermInfoHandle(context)
+	if err == nil {
+		result, err := ts.GetTrainingPrograms(user)
+		if err == nil {
+			context.Data(200, "application/pdf", result)
+			return
+		}
+		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+	}
+}
+
+// @Summary 正方教务考试信息
+// @Description 正方教务考试信息
+// @Tags 正方
+// @Produce  json
 // @Param term body string true "学期"
 // @Param year body string true "年份"
 // @Param username body string true "用户名"
@@ -126,7 +147,7 @@ func GetExamInfo(context *gin.Context) {
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/zf/exam [post]
+// @Router /student/zf/room [post]
 func GetRoomInfo(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err == nil {

@@ -50,7 +50,7 @@ func LibraryBorrowHistory(context *gin.Context) {
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/library/current/0 [post]
+// @Router /student/library/current [post]
 func LibraryCurrentBorrow(context *gin.Context) {
 	isValid := helps.CheckPostFormEmpty(
 		context,

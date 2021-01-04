@@ -14,3 +14,5 @@ var ZfScore = ZF_URL + "cjcx/cjcx_cxDgXscj.html?doType=query"
 var ZfScoreDetail = ZF_URL + "cjcx/cjcx_cxXsKccjList.html?doType=query"
 
 var ZfEmptyClassRoom = ZF_URL + "cdjy/cdjy_cxKxcdlb.html?doType=query"
+var ZfUserInfo = ZF_URL + "/xsxxxggl/xsgrxxwh_cxXsgrxx.html?gnmkdm=N100801&layout=default"
+var ZfPY = ZF_URL + "/pyfagl/pyfaxxck_dyPyfaxx.html?id="

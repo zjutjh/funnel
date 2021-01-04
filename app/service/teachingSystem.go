@@ -5,6 +5,7 @@ import (
 	"funnel/app/errors"
 	"funnel/app/helps"
 	"funnel/app/model"
+	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -46,6 +47,32 @@ func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *mode
 	}
 
 	return string(s), nil
+}
+
+func (t *TeachingSystem) GetTrainingPrograms(stu *model.User) ([]byte, error) {
+
+	client := &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
+	request, _ := http.NewRequest("GET", apis.ZfUserInfo, nil)
+	request.AddCookie(&stu.Session)
+	response, err := client.Do(request)
+
+	if err != nil {
+		return nil, err
+	}
+	doc, err := goquery.NewDocumentFromReader(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	s, exist := doc.Find("#pyfaxx_id").Attr("value")
+	if exist {
+		request, _ := http.NewRequest("GET", apis.ZfPY+s, nil)
+		request.AddCookie(&stu.Session)
+		res, _ := client.Do(request)
+		s, _ := ioutil.ReadAll(res.Body)
+		return s, nil
+	}
+	return nil, nil
 }
 
 func (t *TeachingSystem) GetEmptyRoomInfo(year string, term string, campus string, weekday string, week string, classPeriod string, stu *model.User) (string, error) {

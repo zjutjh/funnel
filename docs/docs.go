@@ -180,7 +180,7 @@ var doc = `{
                 }
             }
         },
-        "/student/library/current/0": {
+        "/student/library/current": {
             "post": {
                 "description": "图书馆当前借书记录",
                 "produces": [
@@ -295,6 +295,152 @@ var doc = `{
                     {
                         "description": "年份",
                         "name": "year",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":{object},\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/zf/program": {
+            "post": {
+                "description": "正方教务考试信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "正方"
+                ],
+                "summary": "正方教务考试信息",
+                "parameters": [
+                    {
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "密码",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "code\":200,\"data\":{object},\"msg\":\"OK\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    },
+                    "400": {
+                        "description": "code\":400,\"data\":null,\"msg\":\"\"}",
+                        "schema": {
+                            "type": "json"
+                        }
+                    }
+                }
+            }
+        },
+        "/student/zf/room": {
+            "post": {
+                "description": "正方教务考试信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "正方"
+                ],
+                "summary": "正方教务考试信息",
+                "parameters": [
+                    {
+                        "description": "学期",
+                        "name": "term",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "年份",
+                        "name": "year",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "校区",
+                        "name": "campus",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "星期几 1，2，3",
+                        "name": "weekday",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "第几周的2次幂的和",
+                        "name": "week",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "第几节课的2次幂的和",
+                        "name": "classPeriod",
                         "in": "body",
                         "required": true,
                         "schema": {

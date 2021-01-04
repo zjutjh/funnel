@@ -16,6 +16,7 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 			zf.POST("/table", controller.GetClassTable)
 			zf.POST("/exam", controller.GetExamInfo)
 			zf.POST("/room", controller.GetRoomInfo)
+			zf.POST("/program", controller.GetProgInfo)
 		}
 		library := student.Group("/library")
 		{
