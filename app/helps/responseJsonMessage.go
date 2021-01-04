@@ -1,7 +1,6 @@
 package helps
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 )
 import "funnel/app/errors"
@@ -21,6 +20,5 @@ func FailResponseJson(error errors.ResponseError, d interface{}) ResponseJsonMes
 }
 
 func ContextDataResponseJson(context *gin.Context, response ResponseJsonMessage) {
-	jsonRes, _ := json.Marshal(response)
-	context.Data(200, "application/json", jsonRes)
+	context.JSON(200, response)
 }

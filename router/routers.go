@@ -15,11 +15,12 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 			zf.POST("/score", controller.GetScore)
 			zf.POST("/table", controller.GetClassTable)
 			zf.POST("/exam", controller.GetExamInfo)
+			zf.POST("/room", controller.GetRoomInfo)
 		}
 		library := student.Group("/library")
 		{
 			library.POST("/borrow/history/:page", controller.LibraryBorrowHistory)
-			library.POST("/borrow/current/:page", controller.LibraryCurrentBorrow)
+			library.POST("/borrow/current", controller.LibraryCurrentBorrow)
 		}
 		card := student.Group("/card")
 		{

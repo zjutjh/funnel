@@ -48,6 +48,36 @@ func fetchTermRelatedInfo(requestUrl string, year string, term string, stu *mode
 	return string(s), nil
 }
 
+func (t *TeachingSystem) GetEmptyRoomInfo(year string, term string, campus string, weekday string, week string, classPeriod string, stu *model.User) (string, error) {
+
+	client := &http.Client{CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }}
+	requestData := url.Values{
+		"fwzt":                 {"cx"},
+		"xnm":                  {year},
+		"xqm":                  {term},
+		"xqh_id":               {campus},
+		"jyfs":                 {"0"},
+		"zcd":                  {week},
+		"xqj":                  {weekday},
+		"jcd":                  {classPeriod},
+		"queryModel.showCount": {"1500"}}
+	request, _ := http.NewRequest("POST", apis.ZfEmptyClassRoom, strings.NewReader(requestData.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.AddCookie(&stu.Session)
+	response, err := client.Do(request)
+
+	if err != nil {
+		return "", err
+	}
+
+	s, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(s), nil
+}
+
 func (t *TeachingSystem) login(username string, password string) (*model.User, error) {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
