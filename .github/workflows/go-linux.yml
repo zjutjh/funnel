@@ -25,8 +25,7 @@ jobs:
       run: go test -v ./...
       
     - name: Build project # This would actually build your project, using zip for an example artifact
-      run: |
-          zip -r funnel.zip funnel
+      run: ls ./ && zip -r funnel.zip ./funnel
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
