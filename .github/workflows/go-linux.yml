@@ -32,7 +32,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          tag_name: 'Test Build'
+          tag_name: v2
           release_name: "Test Build"
           draft: false
           prerelease: true
