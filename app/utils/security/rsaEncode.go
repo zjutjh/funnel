@@ -1,4 +1,4 @@
-package helps
+package security
 
 import (
 	"crypto/rand"

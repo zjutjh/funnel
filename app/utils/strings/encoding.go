@@ -1,4 +1,4 @@
-package helps
+package strings
 
 import (
 	"bufio"

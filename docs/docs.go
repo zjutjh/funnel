@@ -180,7 +180,7 @@ var doc = `{
                 }
             }
         },
-        "/student/library/current": {
+        "/student/libraryService/current": {
             "post": {
                 "description": "图书馆当前借书记录",
                 "produces": [
@@ -226,7 +226,7 @@ var doc = `{
                 }
             }
         },
-        "/student/library/history/0": {
+        "/student/libraryService/history/0": {
             "post": {
                 "description": "图书馆借书记录（暂时只支持10本）",
                 "produces": [

@@ -2,12 +2,10 @@ package controller
 
 import (
 	"funnel/app/errors"
-	"funnel/app/helps"
-	"funnel/app/service"
+	"funnel/app/service/libraryService"
+	"funnel/app/utils"
 	"github.com/gin-gonic/gin"
 )
-
-var librarySystem = service.LibrarySystem{}
 
 // @Summary 图书馆历史借书记录
 // @Description 图书馆借书记录（暂时只支持10本）
@@ -17,29 +15,29 @@ var librarySystem = service.LibrarySystem{}
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/library/history/0 [post]
+// @Router /student/libraryService/history/0 [post]
 func LibraryBorrowHistory(context *gin.Context) {
-	isValid := helps.CheckPostFormEmpty(
+	isValid := utils.CheckPostFormEmpty(
 		context,
 		[]string{"username", "password"},
 	)
 
 	if !isValid {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
 		return
 	}
 
-	user, err := librarySystem.GetUser(context.PostForm("username"), context.PostForm("password"))
+	user, err := libraryService.GetUser(context.PostForm("username"), context.PostForm("password"))
 	if err == errors.ERR_WRONG_PASSWORD {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
 		return
 	}
 	if err != nil {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
-	books := librarySystem.GetBorrowHistory(user)
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
+	books := libraryService.GetBorrowHistory(user)
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(books))
 }
 
 // @Summary 图书馆当前借书记录
@@ -50,28 +48,28 @@ func LibraryBorrowHistory(context *gin.Context) {
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/library/current [post]
+// @Router /student/libraryService/current [post]
 func LibraryCurrentBorrow(context *gin.Context) {
-	isValid := helps.CheckPostFormEmpty(
+	isValid := utils.CheckPostFormEmpty(
 		context,
 		[]string{"username", "password"},
 	)
 
 	if !isValid {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
 		return
 	}
 
-	user, err := librarySystem.GetUser(context.PostForm("username"), context.PostForm("password"))
+	user, err := libraryService.GetUser(context.PostForm("username"), context.PostForm("password"))
 	if err == errors.ERR_WRONG_PASSWORD {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
 		return
 	}
 	if err != nil {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
 
-	books := librarySystem.GetCurrentBorrow(user)
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(books))
+	books := libraryService.GetCurrentBorrow(user)
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(books))
 }
