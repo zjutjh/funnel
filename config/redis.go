@@ -17,7 +17,7 @@ func RedisInit() *redis.Client {
 		REDIS_HOST = os.Getenv("REDIS_HOST")
 	}
 	if os.Getenv("REDIS_PORT") != "" {
-		REDIS_HOST = os.Getenv("REDIS_PORT")
+		REDIS_PORT = os.Getenv("REDIS_PORT")
 	}
 
 	if os.Getenv("REDIS_DB") != "" {
@@ -25,7 +25,7 @@ func RedisInit() *redis.Client {
 	}
 
 	RedisClient := redis.NewClient(&redis.Options{
-		Addr: REDIS_HOST + REDIS_PORT,
+		Addr: REDIS_HOST + ":" + REDIS_PORT,
 		DB:   REDIS_DB,
 	})
 

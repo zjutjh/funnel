@@ -4,25 +4,21 @@ import (
 	"funnel/app/apis/library"
 	"funnel/app/model"
 	"funnel/app/service"
+	"funnel/app/utils/fetch"
 	"github.com/PuerkitoBio/goquery"
 	"log"
-	"net/http"
 	"strings"
 )
 
 func GetBorrowHistory(user *model.User) []model.BorrowedBookInfo {
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-	}
-	requestUrl := library.LibraryBorrowHistory
-	request, _ := http.NewRequest("GET", requestUrl, nil)
-	request.AddCookie(&user.Session)
-	response, _ := client.Do(request)
+	f := fetch.Fetch{}
+	f.Init()
+	f.Cookie = append(f.Cookie, &user.Session)
+	response, _ := f.GetRaw(library.LibraryBorrowHistory)
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	var books []model.BorrowedBookInfo
 	doc.Find("tr[onmouseout=\"this.style.backgroundColor=c\"]").Each(func(i int, s *goquery.Selection) {
 		onmouseout, _ := s.Attr("onmouseout")
@@ -38,13 +34,11 @@ func GetBorrowHistory(user *model.User) []model.BorrowedBookInfo {
 }
 
 func GetCurrentBorrow(user *model.User) []model.BorrowedBookInfo {
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-	}
-	requestUrl := library.LibraryBorrowing
-	request, _ := http.NewRequest("GET", requestUrl, nil)
-	request.AddCookie(&user.Session)
-	response, _ := client.Do(request)
+	f := fetch.Fetch{}
+	f.Init()
+	f.Cookie = append(f.Cookie, &user.Session)
+	response, _ := f.GetRaw(library.LibraryBorrowing)
+
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		log.Fatal(err)

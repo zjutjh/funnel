@@ -5,20 +5,18 @@ import (
 	"funnel/app/errors"
 	"funnel/app/model"
 	"funnel/app/service"
-	"net/http"
+	"funnel/app/utils/fetch"
 )
 
 func login(username string, password string) (*model.User, error) {
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-	}
+	f := fetch.Fetch{}
+	f.Init()
 
 	loginData := genLoginData(username, password)
-	response, _ := client.PostForm(library.LibraryLogin, loginData)
+	_, err := f.PostForm(library.LibraryLogin, loginData)
 
-	if len(response.Cookies()) == 0 {
+	if len(f.Cookie) == 0 || err != nil {
 		return nil, errors.ERR_WRONG_PASSWORD
 	}
-
-	return service.SetUser(service.LibraryPrefix, username, password, response.Cookies()[0])
+	return service.SetUser(service.LibraryPrefix, username, password, f.Cookie[0])
 }

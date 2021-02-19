@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"funnel/app/errors"
 	"funnel/app/model"
-	"funnel/app/service/zf"
+	"funnel/app/service/zfService"
 	"funnel/app/utils"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -20,19 +20,22 @@ import (
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/zf/score/info [post]
+// @Router /student/zfService/score/info [post]
 func GetScoreDetail(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
-	if err == nil {
-		result, err2 := zf.GetScoreDetail(user, context.PostForm("year"), context.PostForm("term"))
-		if err2 == nil {
-			var f interface{}
-			_ = json.Unmarshal([]byte(result), &f)
-			utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
-			return
-		}
+	if err != nil {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
 	}
+	result, err := zfService.GetScoreDetail(user, context.PostForm("year"), context.PostForm("term"))
+	if err != nil {
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
+	}
+	var f interface{}
+	_ = json.Unmarshal([]byte(result), &f)
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
+	return
 }
 
 // @Summary 正方教务成绩
@@ -45,19 +48,22 @@ func GetScoreDetail(context *gin.Context) {
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/zf/score/info [post]
+// @Router /student/zfService/score/info [post]
 func GetScore(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
-	if err == nil {
-		result, err := zf.GetScore(user, context.PostForm("year"), context.PostForm("term"))
-		if err == nil {
-			var f interface{}
-			_ = json.Unmarshal([]byte(result), &f)
-			utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
-			return
-		}
+	if err != nil {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
 	}
+	result, err := zfService.GetScore(user, context.PostForm("year"), context.PostForm("term"))
+	if err != nil {
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
+	}
+	var f interface{}
+	_ = json.Unmarshal([]byte(result), &f)
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
+	return
 }
 
 // @Summary 正方教务课表
@@ -70,19 +76,22 @@ func GetScore(context *gin.Context) {
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/zf/score [post]
+// @Router /student/zfService/score [post]
 func GetClassTable(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
-	if err == nil {
-		result, err := zf.GetClassTable(user, context.PostForm("year"), context.PostForm("term"))
-		if err == nil {
-			var f interface{}
-			_ = json.Unmarshal([]byte(result), &f)
-			utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
-			return
-		}
+	if err != nil {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
 	}
+	result, err := zfService.GetClassTable(user, context.PostForm("year"), context.PostForm("term"))
+	if err != nil {
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
+	}
+	var f interface{}
+	_ = json.Unmarshal([]byte(result), &f)
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
+	return
 }
 
 // @Summary 正方教务考试信息
@@ -93,17 +102,18 @@ func GetClassTable(context *gin.Context) {
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/zf/program [post]
+// @Router /student/zfService/program [post]
 func GetProgInfo(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
-	if err == nil {
-		result, err := zf.GetTrainingPrograms(user)
-		if err == nil {
-			context.Data(200, "application/pdf", result)
-			return
-		}
+	if err != nil {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 	}
+	result, err := zfService.GetTrainingPrograms(user)
+	if err != nil {
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+	}
+	context.Data(200, "application/pdf", result)
+	return
 }
 
 // @Summary 正方教务考试信息
@@ -116,19 +126,20 @@ func GetProgInfo(context *gin.Context) {
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/zf/exam [post]
+// @Router /student/zfService/exam [post]
 func GetExamInfo(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
-	if err == nil {
-		result, err := zf.GetExamInfo(user, context.PostForm("year"), context.PostForm("term"))
-		if err == nil {
-			var f interface{}
-			_ = json.Unmarshal([]byte(result), &f)
-			utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
-			return
-		}
+	if err != nil {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 	}
+	result, err := zfService.GetExamInfo(user, context.PostForm("year"), context.PostForm("term"))
+	if err != nil {
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+	}
+	var f interface{}
+	_ = json.Unmarshal([]byte(result), &f)
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
+	return
 }
 
 // @Summary 正方教务考试信息
@@ -145,7 +156,7 @@ func GetExamInfo(context *gin.Context) {
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
-// @Router /student/zf/room [post]
+// @Router /student/zfService/room [post]
 func GetRoomInfo(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err == nil {
@@ -159,7 +170,7 @@ func GetRoomInfo(context *gin.Context) {
 			return
 		}
 
-		result, err := zf.GetEmptyRoomInfo(user, context.PostForm("year"), context.PostForm("term"), context.PostForm("campus"), context.PostForm("weekday"), context.PostForm("week"), context.PostForm("classPeriod"))
+		result, err := zfService.GetEmptyRoomInfo(user, context.PostForm("year"), context.PostForm("term"), context.PostForm("campus"), context.PostForm("weekday"), context.PostForm("week"), context.PostForm("classPeriod"))
 		if err == nil {
 			var f interface{}
 			_ = json.Unmarshal([]byte(result), &f)
@@ -180,7 +191,7 @@ func ZFTermInfoHandle(context *gin.Context) (*model.User, error) {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
 		return nil, errors.ERR_INVALID_ARGS
 	}
-	user, err := zf.GetUser(context.PostForm("username"), context.PostForm("password"))
+	user, err := zfService.GetUser(context.PostForm("username"), context.PostForm("password"))
 	if err == errors.ERR_WRONG_PASSWORD {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
 		return nil, err
