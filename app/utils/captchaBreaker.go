@@ -1,11 +1,10 @@
-package helps
+package utils
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"funnel/app/apis"
-	"io/ioutil"
-	"net/http"
+	"funnel/app/utils/fetch"
 	"net/url"
 )
 
@@ -15,19 +14,11 @@ type captchaBreakerServerResponse struct {
 }
 
 func BreakCaptcha(s []byte) (string, error) {
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-	}
 
+	f := fetch.Fetch{}
+	f.Init()
 	captchaImageBase64 := base64.StdEncoding.EncodeToString(s)
-	response, err := client.PostForm(apis.CAPTCHA_BREAKER_URL,
-		url.Values{"img_base64": {"data:image/jpeg;base64," + captchaImageBase64}})
-
-	if err != nil {
-		return "", err
-	}
-
-	captcha, err := ioutil.ReadAll(response.Body)
+	captcha, err := f.PostForm(apis.CAPTCHA_BREAKER_URL, url.Values{"img_base64": {"data:image/jpeg;base64," + captchaImageBase64}})
 
 	if err != nil {
 		return "", err

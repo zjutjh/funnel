@@ -1,12 +1,12 @@
-package service
+package schoolcardService
 
 import (
 	"crypto/tls"
 	"fmt"
-	"funnel/app/apis"
-	"funnel/app/errors"
-	"funnel/app/helps"
+	"funnel/app/apis/schoolcard"
 	"funnel/app/model"
+	"funnel/app/service"
+	strings2 "funnel/app/utils/strings"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
@@ -14,8 +14,6 @@ import (
 	"strings"
 )
 
-type CardSystem struct {
-}
 type CardTransaction struct {
 	ID              string
 	Account         string
@@ -30,7 +28,7 @@ type CardTransaction struct {
 	Balance         string
 }
 
-func (t *CardSystem) GetCurrentBalance(user *model.User) string {
+func GetCurrentBalance(user *model.User) string {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -39,7 +37,7 @@ func (t *CardSystem) GetCurrentBalance(user *model.User) string {
 		Transport:     transport,
 	}
 
-	request, _ := http.NewRequest("GET", apis.CardBalance, nil)
+	request, _ := http.NewRequest("GET", schoolcard.CardBalance, nil)
 	request.AddCookie(&user.Session)
 	response, _ := client.Do(request)
 
@@ -51,7 +49,7 @@ func (t *CardSystem) GetCurrentBalance(user *model.User) string {
 	return doc.Find("#lblOne0").Text()
 }
 
-func (t *CardSystem) GetCardToday(user *model.User) []CardTransaction {
+func GetCardToday(user *model.User) []CardTransaction {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -60,10 +58,10 @@ func (t *CardSystem) GetCardToday(user *model.User) []CardTransaction {
 		Transport:     transport,
 	}
 
-	request, _ := http.NewRequest("GET", apis.CardToday, nil)
+	request, _ := http.NewRequest("GET", schoolcard.CardToday, nil)
 	request.AddCookie(&user.Session)
 	response, _ := client.Do(request)
-	utf8Body, err := helps.DecodeHTMLBody(response.Body, "GBK")
+	utf8Body, err := strings2.DecodeHTMLBody(response.Body, "GBK")
 	doc, err := goquery.NewDocumentFromReader(utf8Body)
 
 	if err != nil {
@@ -90,7 +88,7 @@ func (t *CardSystem) GetCardToday(user *model.User) []CardTransaction {
 	})
 	return cardTransactions
 }
-func (t *CardSystem) GetCardHistory(user *model.User, year string, month string) []CardTransaction {
+func GetCardHistory(user *model.User, year string, month string) []CardTransaction {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -99,7 +97,7 @@ func (t *CardSystem) GetCardHistory(user *model.User, year string, month string)
 		Transport:     transport,
 	}
 
-	request, _ := http.NewRequest("GET", apis.CardHistoryQuery, nil)
+	request, _ := http.NewRequest("GET", schoolcard.CardHistoryQuery, nil)
 	request.AddCookie(&user.Session)
 	response, _ := client.Do(request)
 	doc, _ := goquery.NewDocumentFromReader(response.Body)
@@ -112,18 +110,18 @@ func (t *CardSystem) GetCardHistory(user *model.User, year string, month string)
 		"ImageButton1.x":       {"48"},
 		"ImageButton1.y":       {"8"}}
 
-	request, _ = http.NewRequest("POST", apis.CardHistoryQuery, strings.NewReader(loginData.Encode()))
+	request, _ = http.NewRequest("POST", schoolcard.CardHistoryQuery, strings.NewReader(loginData.Encode()))
 
 	request.AddCookie(&user.Session)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	response, _ = client.Do(request)
-	utf8Body, err := helps.DecodeHTMLBody(response.Body, "GBK")
+	utf8Body, err := strings2.DecodeHTMLBody(response.Body, "GBK")
 	doc, err = goquery.NewDocumentFromReader(utf8Body)
 
-	request, _ = http.NewRequest("GET", apis.CardHistory, nil)
+	request, _ = http.NewRequest("GET", schoolcard.CardHistory, nil)
 	request.AddCookie(&user.Session)
 	response, _ = client.Do(request)
-	utf8Body, err = helps.DecodeHTMLBody(response.Body, "GBK")
+	utf8Body, err = strings2.DecodeHTMLBody(response.Body, "GBK")
 	doc, err = goquery.NewDocumentFromReader(utf8Body)
 
 	if err != nil {
@@ -150,50 +148,12 @@ func (t *CardSystem) GetCardHistory(user *model.User, year string, month string)
 	})
 	return cardTransactions
 }
-func (t *CardSystem) login(username string, password string) (*model.User, error) {
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-		Transport:     transport,
-	}
 
-	res, _ := client.Get(apis.CardHome)
-	SSIONID := res.Cookies()[0]
-	doc, _ := goquery.NewDocumentFromReader(res.Body)
-	code := string(doc.Find("#UserLogin_ImgFirst").AttrOr("src", "0")[7])
-	code += string(doc.Find("#UserLogin_imgSecond").AttrOr("src", "0")[7])
-	code += string(doc.Find("#UserLogin_imgThird").AttrOr("src", "0")[7])
-	code += string(doc.Find("#UserLogin_imgFour").AttrOr("src", "0")[7])
-	loginData := url.Values{
-		"__VIEWSTATE":              {doc.Find("#__VIEWSTATE").AttrOr("value", "")},
-		"__VIEWSTATEGENERATOR":     {doc.Find("#__VIEWSTATEGENERATOR").AttrOr("value", "")},
-		"__EVENTVALIDATION":        {doc.Find("#__EVENTVALIDATION").AttrOr("value", "")},
-		"UserLogin:txtUser":        {username},
-		"UserLogin:txtPwd":         {password},
-		"UserLogin:ddlPerson":      {"\xBF\xA8\xBB\xA7"},
-		"UserLogin:txtSure":        {code},
-		"UserLogin:ImageButton1.x": {"48"},
-		"UserLogin:ImageButton1.y": {"8"}}
-	request, _ := http.NewRequest("POST", apis.CardHome, strings.NewReader(loginData.Encode()))
-	request.AddCookie(SSIONID)
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	response, _ := client.Do(request)
-
-	if response.StatusCode != http.StatusFound {
-		return nil, errors.ERR_WRONG_PASSWORD
-	}
-
-	cookie := SSIONID
-	return SetUser(CardPrefix, username, password, cookie)
-}
-
-func (t *CardSystem) GetUser(username string, password string) (*model.User, error) {
-	user, err := GetUser(CardPrefix, username, password)
+func GetUser(username string, password string) (*model.User, error) {
+	user, err := service.GetUser(service.CardPrefix, username, password)
 	if err != nil {
 		fmt.Println(err.Error())
-		return t.login(username, password)
+		return login(username, password)
 	}
 	return user, err
 }

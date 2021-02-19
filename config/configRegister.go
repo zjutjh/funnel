@@ -15,6 +15,6 @@ func init() {
 
 func SetupConfigs(r *gin.Engine) {
 	log.Print("Setup Configs....")
-	setupSession(r)
+	RedisInit()
 	log.Print("Setup Configs Finish....")
 }

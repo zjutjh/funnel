@@ -180,7 +180,7 @@ var doc = `{
                 }
             }
         },
-        "/student/library/current": {
+        "/student/libraryService/current": {
             "post": {
                 "description": "图书馆当前借书记录",
                 "produces": [
@@ -226,7 +226,7 @@ var doc = `{
                 }
             }
         },
-        "/student/library/history/0": {
+        "/student/libraryService/history/0": {
             "post": {
                 "description": "图书馆借书记录（暂时只支持10本）",
                 "produces": [
@@ -272,7 +272,7 @@ var doc = `{
                 }
             }
         },
-        "/student/zf/exam": {
+        "/student/zfService/exam": {
             "post": {
                 "description": "正方教务考试信息",
                 "produces": [
@@ -336,7 +336,7 @@ var doc = `{
                 }
             }
         },
-        "/student/zf/program": {
+        "/student/zfService/program": {
             "post": {
                 "description": "正方教务考试信息",
                 "produces": [
@@ -382,7 +382,7 @@ var doc = `{
                 }
             }
         },
-        "/student/zf/room": {
+        "/student/zfService/room": {
             "post": {
                 "description": "正方教务考试信息",
                 "produces": [
@@ -482,7 +482,7 @@ var doc = `{
                 }
             }
         },
-        "/student/zf/score": {
+        "/student/zfService/score": {
             "post": {
                 "description": "正方教务课表",
                 "produces": [
@@ -546,7 +546,7 @@ var doc = `{
                 }
             }
         },
-        "/student/zf/score/info": {
+        "/student/zfService/score/info": {
             "post": {
                 "description": "正方教务成绩",
                 "produces": [

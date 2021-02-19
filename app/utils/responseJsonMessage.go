@@ -1,4 +1,4 @@
-package helps
+package utils
 
 import (
 	"github.com/gin-gonic/gin"
@@ -15,7 +15,7 @@ func SuccessResponseJson(d interface{}) ResponseJsonMessage {
 	return ResponseJsonMessage{Code: 200, Message: "OK", Data: d}
 }
 
-func FailResponseJson(error errors.ResponseError, d interface{}) ResponseJsonMessage {
+func FailResponseJson(error errors.HttpResponseError, d interface{}) ResponseJsonMessage {
 	return ResponseJsonMessage{Code: error.Code, Message: error.Message, Data: d}
 }
 

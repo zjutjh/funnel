@@ -2,12 +2,10 @@ package controller
 
 import (
 	"funnel/app/errors"
-	"funnel/app/helps"
-	"funnel/app/service"
+	"funnel/app/service/schoolcardService"
+	"funnel/app/utils"
 	"github.com/gin-gonic/gin"
 )
-
-var cardSystem = service.CardSystem{}
 
 // @Summary 校园卡余额查询
 // @Description 校园卡余额查询
@@ -19,28 +17,28 @@ var cardSystem = service.CardSystem{}
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/card/balance [post]
 func CardBalance(context *gin.Context) {
-	isValid := helps.CheckPostFormEmpty(
+	isValid := utils.CheckPostFormEmpty(
 		context,
 		[]string{"username", "password"},
 	)
 
 	if !isValid {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
 		return
 	}
 
-	user, err := cardSystem.GetUser(context.PostForm("username"), context.PostForm("password"))
+	user, err := schoolcardService.GetUser(context.PostForm("username"), context.PostForm("password"))
 	if err == errors.ERR_WRONG_PASSWORD {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
 		return
 	}
 	if err != nil {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
 
-	balance := cardSystem.GetCurrentBalance(user)
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(balance))
+	balance := schoolcardService.GetCurrentBalance(user)
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(balance))
 }
 
 // @Summary 校园卡今日消费查询
@@ -53,29 +51,29 @@ func CardBalance(context *gin.Context) {
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/card/today [post]
 func CardToday(context *gin.Context) {
-	isValid := helps.CheckPostFormEmpty(
+	isValid := utils.CheckPostFormEmpty(
 		context,
 		[]string{"username", "password"},
 	)
 
 	if !isValid {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
 		return
 	}
 
-	user, err := cardSystem.GetUser(context.PostForm("username"), context.PostForm("password"))
+	user, err := schoolcardService.GetUser(context.PostForm("username"), context.PostForm("password"))
 
 	if err == errors.ERR_WRONG_PASSWORD {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
 		return
 	}
 	if err != nil {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
 
-	balance := cardSystem.GetCardToday(user)
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(balance))
+	balance := schoolcardService.GetCardToday(user)
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(balance))
 }
 
 // @Summary 校园卡历史查询
@@ -90,25 +88,25 @@ func CardToday(context *gin.Context) {
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/card/history [post]
 func CardHistory(context *gin.Context) {
-	isValid := helps.CheckPostFormEmpty(
+	isValid := utils.CheckPostFormEmpty(
 		context,
 		[]string{"username", "password", "year", "month"},
 	)
 
 	if !isValid {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.InvalidArgs, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
 		return
 	}
 
-	user, err := cardSystem.GetUser(context.PostForm("username"), context.PostForm("password"))
+	user, err := schoolcardService.GetUser(context.PostForm("username"), context.PostForm("password"))
 	if err == errors.ERR_WRONG_PASSWORD {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.WrongPassword, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
 		return
 	}
 	if err != nil {
-		helps.ContextDataResponseJson(context, helps.FailResponseJson(errors.UnKnown, nil))
+		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
-	history := cardSystem.GetCardHistory(user, context.PostForm("year"), context.PostForm("month"))
-	helps.ContextDataResponseJson(context, helps.SuccessResponseJson(history))
+	history := schoolcardService.GetCardHistory(user, context.PostForm("year"), context.PostForm("month"))
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(history))
 }
