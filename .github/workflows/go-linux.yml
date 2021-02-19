@@ -2,9 +2,7 @@ name: Go
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
 
@@ -24,20 +22,30 @@ jobs:
     - name: Test
       run: go test -v ./...
       
-    - name: zip project # This would actually build your project, using zip for an example artifact
+    - name: zip project
       run: ls ./ && zip -r funnel.zip ./funnel
+
+    - name: Tag
+      id: autotagger
+      uses: butlerlogic/action-autotag@stable
+      with:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
     - name: Create Release
+      if: steps.autotagger.outputs.tagname != ''
       id: create_release
       uses: actions/create-release@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          tag_name: v2
-          release_name: "Test Build"
+          tag_name: ${{ steps.autotagger.outputs.tagname }}
+          release_name: Version ${{ steps.autotagger.outputs.version }}
           draft: false
           prerelease: true
+
     - name: Upload Release Asset
-      id: upload-release-asset 
+      id: upload-release-asset
+      if: steps.autotagger.outputs.tagname != ''
       uses: actions/upload-release-asset@v1
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
