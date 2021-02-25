@@ -52,9 +52,10 @@ func GetCurrentBorrow(user *model.User) []model.BorrowedBookInfo {
 			token := s.Find("span").Nodes
 			libraryID := strings.Trim(token[0].FirstChild.Data, " \r\n")
 			libraryPlace := strings.Trim(token[1].FirstChild.Data, " \r\n")
-			time := strings.Trim(token[2].FirstChild.Data, " \r\n")
-			returnTime := strings.Trim(token[3].FirstChild.Data, " \r\n")
-			renewalsTimes := strings.Trim(token[4].FirstChild.Data, " \r\n")
+			renewalsTimes := strings.Trim(token[2].FirstChild.Data, " \r\n")
+			time := strings.Trim(token[3].FirstChild.Data, " \r\n")
+			returnTime := strings.Trim(token[4].FirstChild.Data, " \r\n")
+
 			isExtended := strings.Trim(token[5].FirstChild.Data, " \r\n")
 			book := model.BorrowedBookInfo{
 				Name:          bookName,
