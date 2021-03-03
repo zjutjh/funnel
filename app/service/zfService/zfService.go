@@ -31,7 +31,7 @@ func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string) (strin
 	requestData := genTermRelatedInfoReqData(year, term)
 	s, err := f.PostForm(requestUrl, requestData)
 
-	if err != nil {
+	if err != nil || len(s) == 0 {
 		service.ForgetAllUser(service.ZFPrefix)
 		return "", err
 	}

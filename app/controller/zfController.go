@@ -24,7 +24,6 @@ import (
 func GetScoreDetail(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
 	result, err := zfService.GetScoreDetail(user, context.PostForm("year"), context.PostForm("term"))
@@ -52,7 +51,6 @@ func GetScoreDetail(context *gin.Context) {
 func GetScore(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
 	result, err := zfService.GetScore(user, context.PostForm("year"), context.PostForm("term"))
@@ -80,7 +78,6 @@ func GetScore(context *gin.Context) {
 func GetClassTable(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
 	result, err := zfService.GetClassTable(user, context.PostForm("year"), context.PostForm("term"))
@@ -106,7 +103,8 @@ func GetClassTable(context *gin.Context) {
 func GetProgInfo(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+
+		return
 	}
 	result, err := zfService.GetTrainingPrograms(user)
 	if err != nil {
@@ -130,11 +128,12 @@ func GetProgInfo(context *gin.Context) {
 func GetExamInfo(context *gin.Context) {
 	user, err := ZFTermInfoHandle(context)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
 	}
 	result, err := zfService.GetExamInfo(user, context.PostForm("year"), context.PostForm("term"))
 	if err != nil {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
 	}
 	var f interface{}
 	_ = json.Unmarshal([]byte(result), &f)

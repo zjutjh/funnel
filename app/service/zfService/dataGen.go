@@ -10,9 +10,7 @@ import (
 func genTermRelatedInfoReqData(year string, term string) url.Values {
 	return url.Values{"xnm": {year}, "xqm": {term}, "queryModel.showCount": {"1500"}}
 }
-func genLoginData(username, captcha, password string) url.Values {
-	f := fetch.Fetch{}
-	f.Init()
+func genLoginData(username, captcha, password string, f fetch.Fetch) url.Values {
 	s, _ := f.Get(zf.ZfLoginGetPublickey())
 	encodePassword, _ := security.GetEncodePassword(s, []byte(password))
 	return url.Values{"yhm": {username}, "mm": {encodePassword}, "yzm": {captcha}}

@@ -21,7 +21,7 @@ func login(username string, password string) (*model.User, error) {
 
 	s, err := f.Get(zf.ZfLoginKaptcha())
 	captcha, _ := utils.BreakCaptcha(s)
-	loginData := genLoginData(username, captcha, password)
+	loginData := genLoginData(username, captcha, password, f)
 
 	s, _ = f.PostForm(zf.ZfLoginHome(), loginData)
 
