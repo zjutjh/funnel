@@ -1,5 +1,7 @@
 .idea/
+.vscode
 *.env
 .env
 funnel
+funnel.exe
 .DS_Store

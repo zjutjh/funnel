@@ -1,6 +1,7 @@
-package controller
+package schoolCardController
 
 import (
+	"funnel/app/controller"
 	"funnel/app/errors"
 	"funnel/app/service/schoolcardService"
 	"funnel/app/utils"
@@ -17,27 +18,16 @@ import (
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/card/balance [post]
 func CardBalance(context *gin.Context) {
-	isValid := utils.CheckPostFormEmpty(
-		context,
-		[]string{"username", "password"},
-	)
-
-	if !isValid {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
-		return
-	}
-
-	user, err := schoolcardService.GetUser(context.PostForm("username"), context.PostForm("password"))
-	if err == errors.ERR_WRONG_PASSWORD {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
-		return
-	}
+	user, err := controller.LoginHandle(context, schoolcardService.GetUser)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
+		return
+	}
+	balance, err := schoolcardService.GetCurrentBalance(user)
+	if err != nil {
+		controller.ErrorHandle(context, err)
 		return
 	}
 
-	balance := schoolcardService.GetCurrentBalance(user)
 	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(balance))
 }
 
@@ -51,28 +41,16 @@ func CardBalance(context *gin.Context) {
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/card/today [post]
 func CardToday(context *gin.Context) {
-	isValid := utils.CheckPostFormEmpty(
-		context,
-		[]string{"username", "password"},
-	)
-
-	if !isValid {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
-		return
-	}
-
-	user, err := schoolcardService.GetUser(context.PostForm("username"), context.PostForm("password"))
-
-	if err == errors.ERR_WRONG_PASSWORD {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
-		return
-	}
+	user, err := controller.LoginHandle(context, schoolcardService.GetUser)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
 
-	balance := schoolcardService.GetCardToday(user)
+	balance, err := schoolcardService.GetCardToday(user)
+	if err != nil {
+		controller.ErrorHandle(context, err)
+		return
+	}
 	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(balance))
 }
 
@@ -98,15 +76,16 @@ func CardHistory(context *gin.Context) {
 		return
 	}
 
-	user, err := schoolcardService.GetUser(context.PostForm("username"), context.PostForm("password"))
-	if err == errors.ERR_WRONG_PASSWORD {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
-		return
-	}
+	user, err := controller.LoginHandle(context, schoolcardService.GetUser)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
-	history := schoolcardService.GetCardHistory(user, context.PostForm("year"), context.PostForm("month"))
+
+	history, err := schoolcardService.GetCardHistory(user, context.PostForm("year"), context.PostForm("month"))
+
+	if err != nil {
+		controller.ErrorHandle(context, err)
+		return
+	}
 	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(history))
 }

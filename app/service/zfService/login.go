@@ -15,15 +15,28 @@ func login(username string, password string) (*model.User, error) {
 	f := fetch.Fetch{}
 	f.Init()
 	_, err := f.Get(zf.ZfLoginHome())
-	if err != nil || len(f.Cookie) < 1 {
+
+	if err != nil {
+		return nil, err
+	}
+	if len(f.Cookie) < 1 {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
 
 	s, err := f.Get(zf.ZfLoginKaptcha())
-	captcha, _ := utils.BreakCaptcha(s)
+	if err != nil {
+		return nil, err
+	}
+	captcha, err := utils.BreakCaptcha(s)
+	if err != nil {
+		return nil, err
+	}
 	loginData := genLoginData(username, captcha, password, f)
 
-	s, _ = f.PostForm(zf.ZfLoginHome(), loginData)
+	s, err = f.PostForm(zf.ZfLoginHome(), loginData)
+	if err != nil {
+		return nil, err
+	}
 
 	if strings.Contains(string(s), "验证码输入错误") {
 		return nil, errors.ERR_WRONG_Captcha

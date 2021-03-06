@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type Fetch struct {
@@ -13,12 +14,22 @@ type Fetch struct {
 	client *http.Client
 }
 
-func (f *Fetch) Init() {
+func (f *Fetch) InitUnSafe() {
 	f.client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
+		Timeout:       time.Second * 5,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
 	}
 }
 
+func (f *Fetch) Init() {
+	f.client = &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
+		Timeout:       time.Second * 5,
+	}
+}
 func (f *Fetch) SkipTlsCheck() {
 	f.client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -54,14 +65,16 @@ func (f *Fetch) GetRaw(url string) (*http.Response, error) {
 	return response, err
 }
 
-func (f *Fetch) PostForm(url string, requestData url.Values) ([]byte, error) {
+func (f *Fetch) PostFormRaw(url string, requestData url.Values) (*http.Response, error) {
 	request, _ := http.NewRequest("POST", url, strings.NewReader(requestData.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	for _, v := range f.Cookie {
 		request.AddCookie(v)
 	}
-	response, err := f.client.Do(request)
-
+	return f.client.Do(request)
+}
+func (f *Fetch) PostForm(url string, requestData url.Values) ([]byte, error) {
+	response, err := f.PostFormRaw(url, requestData)
 	if err != nil {
 		return nil, err
 	}

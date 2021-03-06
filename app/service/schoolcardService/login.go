@@ -1,40 +1,41 @@
 package schoolcardService
 
 import (
-	"crypto/tls"
 	"funnel/app/apis/schoolcard"
 	"funnel/app/errors"
 	"funnel/app/model"
 	"funnel/app/service"
+	"funnel/app/utils/fetch"
 	"github.com/PuerkitoBio/goquery"
 	"net/http"
-	"strings"
 )
 
+func GetUser(username string, password string) (*model.User, error) {
+	user, err := service.GetUser(service.CardPrefix, username, password)
+	if err != nil {
+		return login(username, password)
+	}
+	return user, err
+}
+
 func login(username string, password string) (*model.User, error) {
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	f := fetch.Fetch{}
+	f.InitUnSafe()
+	res, err := f.GetRaw(schoolcard.CardHome)
+	if err != nil {
+		return nil, err
 	}
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-		Transport:     transport,
-	}
-
-	res, _ := client.Get(schoolcard.CardHome)
-	SSIONID := res.Cookies()[0]
 	doc, _ := goquery.NewDocumentFromReader(res.Body)
-
 	loginData := genLoginData(doc, username, password)
+	response, err := f.PostFormRaw(schoolcard.CardHome, loginData)
 
-	request, _ := http.NewRequest("POST", schoolcard.CardHome, strings.NewReader(loginData.Encode()))
-	request.AddCookie(SSIONID)
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	response, _ := client.Do(request)
-
+	if err != nil {
+		return nil, err
+	}
 	if response.StatusCode != http.StatusFound {
 		return nil, errors.ERR_WRONG_PASSWORD
 	}
 
-	cookie := SSIONID
+	cookie := res.Cookies()[0]
 	return service.SetUser(service.CardPrefix, username, password, cookie)
 }

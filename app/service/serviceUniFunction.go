@@ -50,3 +50,10 @@ func ForgetAllUser(prefix string) {
 		config.Redis.Del(v)
 	}
 }
+
+func ForgetUserByUsername(prefix, username string) {
+	res, _ := config.Redis.Keys(prefix + username + "*").Result()
+	for _, v := range res {
+		config.Redis.Del(v)
+	}
+}

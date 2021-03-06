@@ -1,14 +1,13 @@
 package zfService
 
 import (
-	"funnel/app/apis"
 	"funnel/app/apis/zf"
+	"funnel/app/errors"
 	"funnel/app/model"
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
-	"log"
 )
 
 func GetClassTable(stu *model.User, year string, term string) (string, error) {
@@ -31,11 +30,13 @@ func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string) (strin
 	requestData := genTermRelatedInfoReqData(year, term)
 	s, err := f.PostForm(requestUrl, requestData)
 
-	if err != nil || len(s) == 0 {
-		service.ForgetAllUser(service.ZFPrefix)
+	if len(s) == 0 {
+		service.ForgetUserByUsername(service.ZFPrefix, stu.Username)
+		return "", errors.ERR_Session_Expired
+	}
+	if err != nil {
 		return "", err
 	}
-
 	return string(s), nil
 }
 
@@ -69,6 +70,10 @@ func GetEmptyRoomInfo(stu *model.User, year string, term string, campus string, 
 	requestData := genEmptyRoomReqData(year, term, campus, week, weekday, classPeriod)
 	s, err := f.PostForm(zf.ZfEmptyClassRoom(), requestData)
 
+	if len(s) == 0 {
+		service.ForgetUserByUsername(service.ZFPrefix, stu.Username)
+		return "", errors.ERR_Session_Expired
+	}
 	if err != nil {
 		return "", err
 	}
@@ -82,14 +87,4 @@ func GetUser(username string, password string) (*model.User, error) {
 		return login(username, password)
 	}
 	return user, err
-}
-
-func ZFServerChange() {
-	if apis.ZF_URL == apis.ZF_Main_URL {
-		apis.ZF_URL = apis.ZF_BK_URL
-	} else {
-		apis.ZF_URL = apis.ZF_Main_URL
-	}
-	service.ForgetAllUser(service.ZFPrefix)
-	log.Print("ZF Server Change To " + apis.ZF_URL)
 }

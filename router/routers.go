@@ -1,7 +1,10 @@
 package router
 
 import (
-	"funnel/app/controller"
+	"funnel/app/controller/libraryController"
+	"funnel/app/controller/schoolCardController"
+	"funnel/app/controller/zfController"
+	"funnel/app/midware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -9,25 +12,28 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 
 	student := r.Group("/student")
 	{
-		zf := student.Group("/zf")
+		zf := student.Group("/zf", midware.CheckUsernamePassword)
 		{
-			zf.POST("/score/info", controller.GetScoreDetail)
-			zf.POST("/score", controller.GetScore)
-			zf.POST("/table", controller.GetClassTable)
-			zf.POST("/exam", controller.GetExamInfo)
-			zf.POST("/room", controller.GetRoomInfo)
-			zf.POST("/program", controller.GetProgInfo)
+			term := student.Group("", midware.CheckTermInfoForm)
+			{
+				term.POST("/score/info", zfController.GetScoreDetail)
+				term.POST("/score", zfController.GetScore)
+				term.POST("/table", zfController.GetClassTable)
+				term.POST("/exam", zfController.GetExamInfo)
+			}
+			zf.POST("/room", zfController.GetRoomInfo)
+			zf.POST("/program", zfController.GetProgInfo)
 		}
-		library := student.Group("/libraryService")
+		library := student.Group("/library", midware.CheckUsernamePassword)
 		{
-			library.POST("/borrow/history/:page", controller.LibraryBorrowHistory)
-			library.POST("/borrow/current", controller.LibraryCurrentBorrow)
+			library.POST("/borrow/history", libraryController.LibraryBorrowHistory)
+			library.POST("/borrow/current", libraryController.LibraryCurrentBorrow)
 		}
-		card := student.Group("/card")
+		card := student.Group("/card", midware.CheckUsernamePassword)
 		{
-			card.POST("/balance", controller.CardBalance)
-			card.POST("/today", controller.CardToday)
-			card.POST("/history", controller.CardHistory)
+			card.POST("/balance", schoolCardController.CardBalance)
+			card.POST("/today", schoolCardController.CardToday)
+			card.POST("/history", schoolCardController.CardHistory)
 		}
 	}
 

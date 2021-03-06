@@ -1,7 +1,7 @@
-package controller
+package libraryController
 
 import (
-	"funnel/app/errors"
+	"funnel/app/controller"
 	"funnel/app/service/libraryService"
 	"funnel/app/utils"
 	"github.com/gin-gonic/gin"
@@ -17,26 +17,16 @@ import (
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/libraryService/history/0 [post]
 func LibraryBorrowHistory(context *gin.Context) {
-	isValid := utils.CheckPostFormEmpty(
-		context,
-		[]string{"username", "password"},
-	)
 
-	if !isValid {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
-		return
-	}
-
-	user, err := libraryService.GetUser(context.PostForm("username"), context.PostForm("password"))
-	if err == errors.ERR_WRONG_PASSWORD {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
-		return
-	}
+	user, err := controller.LoginHandle(context, libraryService.GetUser)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
-	books := libraryService.GetBorrowHistory(user)
+	books, err := libraryService.GetBorrowHistory(user)
+	if err != nil {
+		controller.ErrorHandle(context, err)
+		return
+	}
 	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(books))
 }
 
@@ -50,26 +40,14 @@ func LibraryBorrowHistory(context *gin.Context) {
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/libraryService/current [post]
 func LibraryCurrentBorrow(context *gin.Context) {
-	isValid := utils.CheckPostFormEmpty(
-		context,
-		[]string{"username", "password"},
-	)
-
-	if !isValid {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
-		return
-	}
-
-	user, err := libraryService.GetUser(context.PostForm("username"), context.PostForm("password"))
-	if err == errors.ERR_WRONG_PASSWORD {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.WrongPassword, nil))
-		return
-	}
+	user, err := controller.LoginHandle(context, libraryService.GetUser)
 	if err != nil {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.UnKnown, nil))
 		return
 	}
-
-	books := libraryService.GetCurrentBorrow(user)
+	books, err := libraryService.GetCurrentBorrow(user)
+	if err != nil {
+		controller.ErrorHandle(context, err)
+		return
+	}
 	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(books))
 }
