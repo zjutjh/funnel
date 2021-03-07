@@ -14,7 +14,7 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 	{
 		zf := student.Group("/zf", midware.CheckUsernamePassword)
 		{
-			term := student.Group("", midware.CheckTermInfoForm)
+			term := zf.Group("", midware.CheckTermInfoForm)
 			{
 				term.POST("/score/info", zfController.GetScoreDetail)
 				term.POST("/score", zfController.GetScore)

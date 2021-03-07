@@ -25,6 +25,6 @@ func BreakCaptcha(s []byte) (string, error) {
 	}
 
 	captchaRes := &captchaBreakerServerResponse{}
-	err = json.Unmarshal(captcha, captchaRes)
-	return captchaRes.Data, err
+	_ = json.Unmarshal(captcha, captchaRes)
+	return captchaRes.Data, nil
 }

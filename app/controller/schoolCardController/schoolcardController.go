@@ -23,6 +23,11 @@ func CardBalance(context *gin.Context) {
 		return
 	}
 	balance, err := schoolcardService.GetCurrentBalance(user)
+	if err == errors.ERR_Session_Expired {
+		user, err = controller.LoginHandle(context, schoolcardService.GetUser)
+		balance, err = schoolcardService.GetCurrentBalance(user)
+	}
+
 	if err != nil {
 		controller.ErrorHandle(context, err)
 		return
@@ -47,6 +52,11 @@ func CardToday(context *gin.Context) {
 	}
 
 	balance, err := schoolcardService.GetCardToday(user)
+	if err == errors.ERR_Session_Expired {
+		user, err = controller.LoginHandle(context, schoolcardService.GetUser)
+		balance, err = schoolcardService.GetCardToday(user)
+	}
+
 	if err != nil {
 		controller.ErrorHandle(context, err)
 		return
@@ -82,7 +92,10 @@ func CardHistory(context *gin.Context) {
 	}
 
 	history, err := schoolcardService.GetCardHistory(user, context.PostForm("year"), context.PostForm("month"))
-
+	if err == errors.ERR_Session_Expired {
+		user, err = controller.LoginHandle(context, schoolcardService.GetUser)
+		history, err = schoolcardService.GetCardHistory(user, context.PostForm("year"), context.PostForm("month"))
+	}
 	if err != nil {
 		controller.ErrorHandle(context, err)
 		return

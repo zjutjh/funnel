@@ -18,9 +18,9 @@ func ZFTermInfoHandle(context *gin.Context, cb func(*model.User, string, string)
 
 	result, err := cb(user, context.PostForm("year"), context.PostForm("term"))
 
-	if len(result) == 0 {
-		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.SessionExpired, nil))
-		return "", errors.ERR_SESSION_EXPIRES
+	if err == errors.ERR_Session_Expired {
+		user, err = controller.LoginHandle(context, zfService.GetUser)
+		result, err = cb(user, context.PostForm("year"), context.PostForm("term"))
 	}
 
 	if err != nil {

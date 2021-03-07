@@ -2,7 +2,9 @@ package schoolcardService
 
 import (
 	"funnel/app/apis/schoolcard"
+	"funnel/app/errors"
 	"funnel/app/model"
+	"funnel/app/service"
 	"funnel/app/utils/fetch"
 	strings2 "funnel/app/utils/strings"
 	"github.com/PuerkitoBio/goquery"
@@ -12,8 +14,13 @@ func GetCurrentBalance(user *model.User) (string, error) {
 
 	f := fetch.Fetch{}
 	f.InitUnSafe()
+	f.Cookie = append(f.Cookie, &user.Session)
 
 	response, err := f.GetRaw(schoolcard.CardBalance)
+	if response != nil && response.StatusCode != 200 {
+		service.ForgetUserByUsername(service.CardPrefix, user.Username)
+		return "", errors.ERR_Session_Expired
+	}
 	if err != nil {
 		return "", err
 	}
@@ -27,8 +34,12 @@ func GetCurrentBalance(user *model.User) (string, error) {
 func GetCardToday(user *model.User) ([]model.CardTransaction, error) {
 	f := fetch.Fetch{}
 	f.InitUnSafe()
-
+	f.Cookie = append(f.Cookie, &user.Session)
 	response, err := f.GetRaw(schoolcard.CardToday)
+	if response != nil && response.StatusCode != 200 {
+		service.ForgetUserByUsername(service.CardPrefix, user.Username)
+		return nil, errors.ERR_Session_Expired
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +57,12 @@ func GetCardToday(user *model.User) ([]model.CardTransaction, error) {
 func GetCardHistory(user *model.User, year string, month string) ([]model.CardTransaction, error) {
 	f := fetch.Fetch{}
 	f.InitUnSafe()
-
+	f.Cookie = append(f.Cookie, &user.Session)
 	response, err := f.GetRaw(schoolcard.CardHistoryQuery)
+	if response != nil && response.StatusCode != 200 {
+		service.ForgetUserByUsername(service.CardPrefix, user.Username)
+		return nil, errors.ERR_Session_Expired
+	}
 	if err != nil {
 		return nil, err
 	}

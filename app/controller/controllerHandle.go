@@ -25,6 +25,12 @@ func ErrorHandle(context *gin.Context, err error) {
 			exp = errors.CaptchaFailed
 			break
 		}
+	case errors.ERR_Session_Expired:
+		{
+			exp = errors.SessionExpired
+			break
+		}
+
 	}
 	if errors2.Is(err, http.ErrHandlerTimeout) {
 		exp = errors.RequestFailed

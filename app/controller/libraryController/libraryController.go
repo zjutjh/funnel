@@ -2,6 +2,7 @@ package libraryController
 
 import (
 	"funnel/app/controller"
+	"funnel/app/errors"
 	"funnel/app/service/libraryService"
 	"funnel/app/utils"
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,12 @@ func LibraryBorrowHistory(context *gin.Context) {
 		return
 	}
 	books, err := libraryService.GetBorrowHistory(user)
+
+	if err == errors.ERR_Session_Expired {
+		user, err = controller.LoginHandle(context, libraryService.GetUser)
+		books, err = libraryService.GetBorrowHistory(user)
+	}
+
 	if err != nil {
 		controller.ErrorHandle(context, err)
 		return
@@ -45,6 +52,12 @@ func LibraryCurrentBorrow(context *gin.Context) {
 		return
 	}
 	books, err := libraryService.GetCurrentBorrow(user)
+
+	if err == errors.ERR_Session_Expired {
+		user, err = controller.LoginHandle(context, libraryService.GetUser)
+		books, err = libraryService.GetCurrentBorrow(user)
+	}
+
 	if err != nil {
 		controller.ErrorHandle(context, err)
 		return
