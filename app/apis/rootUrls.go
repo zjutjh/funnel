@@ -9,3 +9,5 @@ var CARD_URL = os.Getenv("CARD_URL")
 
 var ZF_Main_URL = os.Getenv("ZF_URL")
 var ZF_BK_URL = os.Getenv("ZF_URL_BK")
+
+var CANTEEN_URL = os.Getenv("CANTEEN_URL")

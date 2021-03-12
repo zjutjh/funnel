@@ -1,6 +1,7 @@
 package router
 
 import (
+	"funnel/app/controller/canteenController"
 	"funnel/app/controller/libraryController"
 	"funnel/app/controller/schoolCardController"
 	"funnel/app/controller/zfController"
@@ -35,6 +36,10 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 			card.POST("/today", schoolCardController.CardToday)
 			card.POST("/history", schoolCardController.CardHistory)
 		}
+	}
+	canteen := r.Group("/canteen")
+	{
+		canteen.GET("/flow", canteenController.PeopleFlow) // 关于餐厅客流量的路由
 	}
 
 	return r
