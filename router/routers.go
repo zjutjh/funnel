@@ -39,7 +39,7 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 	}
 	canteen := r.Group("/canteen")
 	{
-		canteen.GET("/flow", canteenController.PeopleFlow) // 关于餐厅客流量的路由
+		canteen.GET("/flow", canteenController.Flow) // 关于餐厅客流量的路由
 	}
 
 	return r

@@ -9,13 +9,13 @@ import (
 	"funnel/app/utils/fetch"
 )
 
-func FetchFlow() (string, bool) {
+func FetchFlow() (string, error) {
 	var client fetch.Fetch
 	client.Init()
-	result, err := client.Get(canteen.CanteenFlow)
+	result, err := client.Get(canteen.FlowApi)
 	if err != nil { // 获取数据失败
-		return "fetchError", false
+		return "fetchError", err
 	} else { // 获取数据成功
-		return string(result), true // 返回抓取到的食堂客流量数据
+		return string(result), err // 返回抓取到的食堂客流量数据
 	}
 }
