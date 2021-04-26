@@ -1,7 +1,6 @@
 package zfController
 
 import (
-	"encoding/json"
 	"funnel/app/controller"
 	"funnel/app/errors"
 	"funnel/app/model"
@@ -10,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ZFTermInfoHandle(context *gin.Context, cb func(*model.User, string, string) (string, error)) (string, error) {
+func ZFTermInfoHandle(context *gin.Context, cb func(*model.User, string, string) (interface{}, error)) (interface{}, error) {
 	user, err := controller.LoginHandle(context, zfService.GetUser)
 	if err != nil {
 		return "", err
@@ -28,12 +27,6 @@ func ZFTermInfoHandle(context *gin.Context, cb func(*model.User, string, string)
 		return "", err
 	}
 
-	var f interface{}
-	err = json.Unmarshal([]byte(result), &f)
-	if err != nil {
-		controller.ErrorHandle(context, err)
-		return "", err
-	}
-	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(result))
 	return result, err
 }

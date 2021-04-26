@@ -41,7 +41,7 @@ func genBorrowedBookInfoFromDoc(doc *goquery.Document) []model.BorrowedBookInfo 
 				Time:          time,
 				ReturnTime:    returnTime,
 				RenewalsTimes: renewalsTimes,
-				IsExtended:    isExtended}
+				OverdueTime:   isExtended}
 			books = append(books, book)
 		})
 	})
@@ -56,7 +56,8 @@ func genBorrowedBookHistoryInfoFromDoc(doc *goquery.Document) []model.BorrowedBo
 			bookName := strings.Trim(s.Find("a").Text(), " \n\r")
 			bookId := strings.Trim(s.Find("td").Last().Prev().Prev().Text(), " \r\n")
 			borrowTime := strings.Trim(s.Find("td").Last().Prev().Text(), " \r\n")
-			book := model.BorrowedBookInfo{Name: bookName, LibraryID: bookId, Time: borrowTime}
+			returnTime := strings.Trim(s.Find("td").Last().Text(), " \r\n")
+			book := model.BorrowedBookInfo{Name: bookName, LibraryID: bookId, Time: borrowTime, ReturnTime: returnTime}
 			books = append(books, book)
 		}
 	})

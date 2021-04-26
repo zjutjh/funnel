@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary 图书馆历史借书记录
+// LibraryBorrowHistory @Summary 图书馆历史借书记录
 // @Description 图书馆借书记录（暂时只支持10本）
 // @Tags 图书馆
 // @Produce  json

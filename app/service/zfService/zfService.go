@@ -1,6 +1,7 @@
 package zfService
 
 import (
+	"encoding/json"
 	"funnel/app/apis/zf"
 	"funnel/app/errors"
 	"funnel/app/model"
@@ -10,23 +11,55 @@ import (
 	"io/ioutil"
 )
 
-func GetClassTable(stu *model.User, year string, term string) (string, error) {
-	return fetchTermRelatedInfo(stu, zf.ZfClassTable(), year, term)
+func GetLessonsTable(stu *model.User, year string, term string) (interface{}, error) {
+	res, err := fetchTermRelatedInfo(stu, zf.ZfClassTable(), year, term)
+	if err != nil {
+		return nil, err
+	}
+	var f model.LessonsTableRawInfo
+	err = json.Unmarshal([]byte(res), &f)
+	return model.TransformLessonTable(&f), err
 }
-func GetExamInfo(stu *model.User, year string, term string) (string, error) {
-	return fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term)
+func GetExamInfo(stu *model.User, year string, term string) (interface{}, error) {
+	res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term)
+	if err != nil {
+		return nil, err
+	}
+	var f model.ExamRawInfo
+	err = json.Unmarshal([]byte(res), &f)
+	return model.TransformExamInfo(&f), err
+
 }
-func GetScoreDetail(stu *model.User, year string, term string) (string, error) {
-	return fetchTermRelatedInfo(stu, zf.ZfScoreDetail(), year, term)
+func GetScoreDetail(stu *model.User, year string, term string) (interface{}, error) {
+	res, err := fetchTermRelatedInfo(stu, zf.ZfScoreDetail(), year, term)
+	if err != nil {
+		return nil, err
+	}
+	var f model.ScoreDetailRawInfo
+	err = json.Unmarshal([]byte(res), &f)
+	return model.TransformScoreDetailInfo(&f), err
 }
-func GetScore(stu *model.User, year string, term string) (string, error) {
-	return fetchTermRelatedInfo(stu, zf.ZfScore(), year, term)
+func GetScore(stu *model.User, year string, term string) (interface{}, error) {
+	res, err := fetchTermRelatedInfo(stu, zf.ZfScore(), year, term)
+	if err != nil {
+		return nil, err
+	}
+	var f model.ScoreRawInfo
+	err = json.Unmarshal([]byte(res), &f)
+	return model.TransformScoreInfo(&f), err
 }
 
 func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string) (string, error) {
 	f := fetch.Fetch{}
 	f.Init()
 	f.Cookie = append(f.Cookie, &stu.Session)
+	if term == "上" {
+		term = "3"
+	} else if term == "下" {
+		term = "12"
+	} else if term == "短" {
+		term = "16"
+	}
 	requestData := genTermRelatedInfoReqData(year, term)
 	s, err := f.PostForm(requestUrl, requestData)
 

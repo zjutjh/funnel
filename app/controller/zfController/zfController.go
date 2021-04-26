@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"funnel/app/controller"
 	"funnel/app/errors"
+	"funnel/app/model"
 	"funnel/app/service/zfService"
 	"funnel/app/utils"
 	"github.com/gin-gonic/gin"
@@ -69,7 +70,7 @@ func GetExamInfo(context *gin.Context) {
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/zfService/score [post]
 func GetClassTable(context *gin.Context) {
-	_, _ = ZFTermInfoHandle(context, zfService.GetClassTable)
+	_, _ = ZFTermInfoHandle(context, zfService.GetLessonsTable)
 	return
 }
 
@@ -115,7 +116,7 @@ func GetProgInfo(context *gin.Context) {
 // @Param campus body string true "校区"
 // @Param weekday body string true "星期几 1，2，3"
 // @Param week body string true "第几周的2次幂的和"
-// @Param classPeriod body string true "第几节课的2次幂的和"
+// @Param sections body string true "第几节课的2次幂的和"
 // @Param username body string true "用户名"
 // @Param password body string true "密码"
 // @Success 200 json  {"code":200,"data":{object},"msg":"OK"}
@@ -128,7 +129,7 @@ func GetRoomInfo(context *gin.Context) {
 	}
 	isValid := utils.CheckPostFormEmpty(
 		context,
-		[]string{"week", "classPeriod", "campus", "weekday"},
+		[]string{"week", "sections", "campus", "weekday"},
 	)
 
 	if !isValid {
@@ -136,13 +137,13 @@ func GetRoomInfo(context *gin.Context) {
 		return
 	}
 
-	result, err := zfService.GetEmptyRoomInfo(user, context.PostForm("year"), context.PostForm("term"), context.PostForm("campus"), context.PostForm("weekday"), context.PostForm("week"), context.PostForm("classPeriod"))
+	result, err := zfService.GetEmptyRoomInfo(user, context.PostForm("year"), context.PostForm("term"), context.PostForm("campus"), context.PostForm("weekday"), context.PostForm("week"), context.PostForm("sections"))
 	if err == errors.ERR_SESSION_EXPIRES {
 		user, err = controller.LoginHandle(context, zfService.GetUser)
 		if err != nil {
 			return
 		}
-		result, err = zfService.GetEmptyRoomInfo(user, context.PostForm("year"), context.PostForm("term"), context.PostForm("campus"), context.PostForm("weekday"), context.PostForm("week"), context.PostForm("classPeriod"))
+		result, err = zfService.GetEmptyRoomInfo(user, context.PostForm("year"), context.PostForm("term"), context.PostForm("campus"), context.PostForm("weekday"), context.PostForm("week"), context.PostForm("sections"))
 	}
 
 	if err != nil {
@@ -150,13 +151,13 @@ func GetRoomInfo(context *gin.Context) {
 		return
 	}
 
-	var f interface{}
+	var f model.EmptyRoomRawInfo
 	err = json.Unmarshal([]byte(result), &f)
 	if err != nil {
 		controller.ErrorHandle(context, err)
 		return
 	}
-	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(f))
+	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(model.TransformEmptyRoom(&f)))
 	return
 
 }
