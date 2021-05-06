@@ -100,6 +100,20 @@ func GetEmptyRoomInfo(stu *model.User, year string, term string, campus string, 
 	f := fetch.Fetch{}
 	f.Init()
 	f.Cookie = append(f.Cookie, &stu.Session)
+	if term == "上" {
+		term = "3"
+	} else if term == "下" {
+		term = "12"
+	} else if term == "短" {
+		term = "16"
+	}
+	if campus == "朝晖" {
+		campus = "01"
+	} else if campus == "屏峰" {
+		campus = "02"
+	} else if campus == "莫干山" {
+		campus = "A61400B98155D41AE0550113465EF1CF"
+	}
 	requestData := genEmptyRoomReqData(year, term, campus, week, weekday, classPeriod)
 	s, err := f.PostForm(zf.ZfEmptyClassRoom(), requestData)
 

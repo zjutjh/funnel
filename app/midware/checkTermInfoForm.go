@@ -15,5 +15,4 @@ func CheckTermInfoForm(context *gin.Context) {
 		utils.ContextDataResponseJson(context, utils.FailResponseJson(errors.InvalidArgs, nil))
 		context.Abort()
 	}
-	context.Next()
 }
