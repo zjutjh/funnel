@@ -29,6 +29,7 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 		{
 			library.POST("/borrow/history", libraryController.LibraryBorrowHistory)
 			library.POST("/borrow/current", libraryController.LibraryCurrentBorrow)
+			library.POST("/borrow/reborrow", libraryController.LibraryReBorrow)
 		}
 		card := student.Group("/card", midware.CheckUsernamePassword)
 		{
