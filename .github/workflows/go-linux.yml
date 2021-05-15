@@ -16,14 +16,23 @@ jobs:
       with:
         go-version: 1.15
 
-    - name: Build
-      run: go build -v .
+    - name: Setup out dir
+      run: rm -rf ./out && mkdir ./out
+
+    - name: Build Linux
+      run: env GOOS=linux GOARCH=amd64 go build -v -x -o ./out/funnel-linux_amd64 .
+
+    - name: Build Darwin
+      run: env GOOS=darwin GOARCH=amd64 go build -v -x -o ./out/funnel-darwin_amd64 .
+
+    - name: Build Darwin ARM64
+           env GOOS=darwin GOARCH=arm64 go build -v -x -o ./out/funnel-darin_arm64 .
 
     - name: Test
       run: go test -v ./...
       
     - name: zip project
-      run: ls ./ && zip -r funnel.zip ./funnel
+      run: ls -al ./out && zip -r funnel.zip ./out
 
     - name: Tag
       id: autotagger
