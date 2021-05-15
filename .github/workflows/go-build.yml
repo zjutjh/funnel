@@ -26,7 +26,7 @@ jobs:
       run: env GOOS=darwin GOARCH=amd64 go build -v -x -o ./out/funnel-darwin_amd64 .
 
     - name: Build Darwin ARM64
-           env GOOS=darwin GOARCH=arm64 go build -v -x -o ./out/funnel-darin_arm64 .
+      run: env GOOS=darwin GOARCH=arm64 go build -v -x -o ./out/funnel-darin_arm64 .
 
     - name: Test
       run: go test -v ./...
