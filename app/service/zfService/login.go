@@ -1,16 +1,20 @@
 package zfService
 
 import (
+	"encoding/json"
 	"funnel/app/apis/zf"
+	"funnel/app/apis"
 	"funnel/app/errors"
 	"funnel/app/model"
 	"funnel/app/service"
-	"funnel/app/utils"
 	"funnel/app/utils/fetch"
 	"net/http"
 	"strings"
 )
-
+type captchaServerResponse struct {
+	Status int `json:"status"`
+	Data string `json:"msg"`
+}
 func login(username string, password string) (*model.User, error) {
 	f := fetch.Fetch{}
 	f.Init()
@@ -23,17 +27,19 @@ func login(username string, password string) (*model.User, error) {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
 
-	s, err := f.Get(zf.ZfLoginKaptcha())
+	captcha, err := f.Get(apis.CAPTCHA_NEW_BREAKER_URL+f.Cookie[0].Value)
 	if err != nil {
 		return nil, err
 	}
-	captcha, err := utils.BreakCaptcha(s)
-	if err != nil {
-		return nil, err
+	captchaRes := &captchaServerResponse{}
+	_ = json.Unmarshal(captcha, captchaRes)
+	if captchaRes.Status!=0 {
+		return nil, errors.ERR_WRONG_Captcha
 	}
-	loginData := genLoginData(username, captcha, password, f)
 
-	s, err = f.PostForm(zf.ZfLoginHome(), loginData)
+	loginData := genLoginData(username, password, f)
+
+	s, err := f.PostForm(zf.ZfLoginHome(), loginData)
 	if err != nil {
 		return nil, err
 	}
