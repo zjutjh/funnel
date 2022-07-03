@@ -2,8 +2,8 @@ package zfService
 
 import (
 	"encoding/json"
-	"funnel/app/apis/zf"
 	"funnel/app/apis"
+	"funnel/app/apis/zf"
 	"funnel/app/errors"
 	"funnel/app/model"
 	"funnel/app/service"
@@ -11,10 +11,12 @@ import (
 	"net/http"
 	"strings"
 )
+
 type captchaServerResponse struct {
-	Status int `json:"status"`
-	Data string `json:"msg"`
+	Status int    `json:"status"`
+	Data   string `json:"msg"`
 }
+
 func login(username string, password string) (*model.User, error) {
 	f := fetch.Fetch{}
 	f.Init()
@@ -27,13 +29,13 @@ func login(username string, password string) (*model.User, error) {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
 
-	captcha, err := f.Get(apis.CAPTCHA_NEW_BREAKER_URL+f.Cookie[0].Value)
+	captcha, err := f.Get(apis.CAPTCHA_NEW_BREAKER_URL + f.Cookie[0].Value)
 	if err != nil {
 		return nil, err
 	}
 	captchaRes := &captchaServerResponse{}
 	_ = json.Unmarshal(captcha, captchaRes)
-	if captchaRes.Status!=0 {
+	if captchaRes.Status != 0 {
 		return nil, errors.ERR_WRONG_Captcha
 	}
 
@@ -44,7 +46,7 @@ func login(username string, password string) (*model.User, error) {
 		return nil, err
 	}
 
-	if strings.Contains(string(s), "验证码输入错误") {
+	if strings.Contains(string(s), "请先滑动图片进行验证") {
 		return nil, errors.ERR_WRONG_Captcha
 	}
 	if strings.Contains(string(s), "用户名或密码不正确") {
