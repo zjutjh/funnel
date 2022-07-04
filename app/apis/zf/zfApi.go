@@ -19,7 +19,7 @@ func ZfExamInfo() string {
 	return apis.ZF_URL + "/kwgl/kscx_cxXsksxxIndex.html?doType=query"
 }
 func ZfClassTable() string {
-	return apis.ZF_URL + "kbcx/xskbcx_cxXsKb.html?doType=query"
+	return apis.ZF_URL + "kbcx/xskbcx_cxXsKb.html"
 }
 func ZfScore() string {
 	return apis.ZF_URL + "cjcx/cjcx_cxDgXscj.html?doType=query"
