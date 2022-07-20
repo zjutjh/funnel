@@ -73,6 +73,17 @@ func (f *Fetch) PostFormRaw(url string, requestData url.Values) (*http.Response,
 	}
 	return f.client.Do(request)
 }
+
+func (f *Fetch) PostFormRawAsynchronous(url string, requestData url.Values) (*http.Response, error) {
+	request, _ := http.NewRequest("POST", url, strings.NewReader(requestData.Encode()))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
+	for _, v := range f.Cookie {
+		request.AddCookie(v)
+	}
+	return f.client.Do(request)
+}
+
 func (f *Fetch) PostForm(url string, requestData url.Values) ([]byte, error) {
 	response, err := f.PostFormRaw(url, requestData)
 	if err != nil {

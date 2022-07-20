@@ -12,7 +12,7 @@ func genTermRelatedInfoReqData(year string, term string) url.Values {
 		"xnm":                  {year},
 		"xqm":                  {term},
 		"kzlx":                 {"ck"},
-		"queryModel.showCount": {"1500"}}
+		"queryModel.showCount": {"15"}}
 }
 func genLoginData(username, password string, f fetch.Fetch) url.Values {
 	s, _ := f.Get(zf.ZfLoginGetPublickey())
