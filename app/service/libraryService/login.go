@@ -26,6 +26,7 @@ func login(username string, password string) (*model.User, error) {
 		return nil, err
 	}
 	doc, _ := goquery.NewDocumentFromReader(res.Body)
+
 	loginData := genLoginData(doc, username, password)
 	_, err = f.PostForm(library.LibraryLogin, loginData)
 	if err != nil {

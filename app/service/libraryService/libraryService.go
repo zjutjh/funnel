@@ -7,6 +7,7 @@ import (
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
 	"github.com/PuerkitoBio/goquery"
+	"net/url"
 	"strings"
 )
 
@@ -29,7 +30,15 @@ func GetBorrowHistory(user *model.User) ([]model.BorrowedBookInfo, error) {
 		return nil, err
 	}
 
-	books := genBorrowedBookHistoryInfoFromDoc(doc)
+	books, next := genBorrowedBookHistoryInfoFromDoc(doc)
+	for next {
+		form := genBorrowHistoryForm(doc)
+		response, _ = f.PostFormRaw(library.LibraryBorrowHistory, form)
+		doc, err = goquery.NewDocumentFromReader(response.Body)
+		booksNew, nextNew := genBorrowedBookHistoryInfoFromDoc(doc)
+		books = append(books, booksNew...)
+		next = nextNew
+	}
 	return books, nil
 }
 
@@ -47,12 +56,29 @@ func GetCurrentBorrow(user *model.User) ([]model.BorrowedBookInfo, error) {
 	}
 
 	doc, err := goquery.NewDocumentFromReader(response.Body)
-
 	if err != nil {
 		return nil, err
 	}
 
-	books := genBorrowedBookInfoFromDoc(doc)
+	books, next := genBorrowedBookInfoFromDoc(doc)
+
+	var form = url.Values{}
+	if next {
+		form = genCurrentBorrowFormFirst(doc)
+		response, _ = f.PostFormRawAsynchronous(library.LibraryBorrowing, form)
+		doc, err = goquery.NewDocumentFromReader(response.Body)
+		booksNew, nextNew := genBorrowedBookInfoFromDoc(doc)
+		books = append(books, booksNew...)
+		next = nextNew
+	}
+	for next {
+		form = genCurrentBorrowForm(doc)
+		response, _ = f.PostFormRawAsynchronous(library.LibraryBorrowing, form)
+		doc, err = goquery.NewDocumentFromReader(response.Body)
+		booksNew, nextNew := genBorrowedBookInfoFromDoc(doc)
+		books = append(books, booksNew...)
+		next = nextNew
+	}
 	return books, nil
 }
 
