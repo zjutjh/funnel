@@ -35,7 +35,7 @@ func ErrorHandle(context *gin.Context, err error) {
 	if errors2.Is(err, http.ErrHandlerTimeout) {
 		exp = errors.RequestFailed
 	}
-
+	println(err.Error())
 	utils.ContextDataResponseJson(context, utils.FailResponseJson(exp, nil))
 	context.Abort()
 }

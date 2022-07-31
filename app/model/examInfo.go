@@ -14,9 +14,9 @@ func TransformExamInfo(raw *ExamRawInfo) ExamInfo {
 				Credits:     value.Xf,
 				ExamPlace:   value.Cdmc,
 				ExamTime:    value.Kssj,
+				SeatNum:     value.Zwh,
 			})
 	}
-
 	return examInfo
 }
 
@@ -30,6 +30,7 @@ type Exam struct {
 	TeacherName string `json:"teacherName"`
 	ClassName   string `json:"className"`
 	Credits     string `json:"credits"`
+	SeatNum     string `json:"seatNum"`
 }
 
 type ExamInfo []*Exam
@@ -47,5 +48,6 @@ type ExamRawInfo struct {
 		Cdxqmc string
 		Xf     string
 		Cdmc   string
+		Zwh    string
 	}
 }
