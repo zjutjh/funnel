@@ -16,7 +16,7 @@ func ZfLoginKaptcha() string {
 	return apis.ZF_URL + "kaptcha?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
 }
 func ZfExamInfo() string {
-	return apis.ZF_URL + "/kwgl/kscx_cxXsksxxIndex.html?doType=query"
+	return apis.ZF_URL + "kwgl/kscx_cxXsksxxIndex.html?doType=query"
 }
 func ZfClassTable() string {
 	return apis.ZF_URL + "kbcx/xskbcx_cxXsKb.html"
