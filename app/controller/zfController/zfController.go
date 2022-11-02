@@ -85,13 +85,13 @@ func GetClassTable(context *gin.Context) {
 // @Router /student/zfService/program [post]
 func GetProgInfo(context *gin.Context) {
 
-	user, err := controller.LoginHandle(context, zfService.GetUser)
+	user, err := controller.LoginHandle(context, zfService.GetUser, false)
 	if err != nil {
 		return
 	}
 	result, err := zfService.GetTrainingPrograms(user)
 	if err == errors.ERR_SESSION_EXPIRES {
-		user, err = controller.LoginHandle(context, zfService.GetUser)
+		user, err = controller.LoginHandle(context, zfService.GetUser, false)
 		if err != nil {
 			return
 		}
@@ -123,7 +123,7 @@ func GetProgInfo(context *gin.Context) {
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/zfService/room [post]
 func GetRoomInfo(context *gin.Context) {
-	user, err := controller.LoginHandle(context, zfService.GetUser)
+	user, err := controller.LoginHandle(context, zfService.GetUser, false)
 	if err != nil {
 		return
 	}
@@ -139,7 +139,7 @@ func GetRoomInfo(context *gin.Context) {
 
 	result, err := zfService.GetEmptyRoomInfo(user, context.PostForm("year"), context.PostForm("term"), context.PostForm("campus"), context.PostForm("weekday"), context.PostForm("week"), context.PostForm("sections"))
 	if err == errors.ERR_SESSION_EXPIRES {
-		user, err = controller.LoginHandle(context, zfService.GetUser)
+		user, err = controller.LoginHandle(context, zfService.GetUser, false)
 		if err != nil {
 			return
 		}

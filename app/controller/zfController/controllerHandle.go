@@ -10,7 +10,7 @@ import (
 )
 
 func ZFTermInfoHandle(context *gin.Context, cb func(*model.User, string, string) (interface{}, error)) (interface{}, error) {
-	user, err := controller.LoginHandle(context, zfService.GetUser)
+	user, err := controller.LoginHandle(context, zfService.GetUser, false)
 	if err != nil {
 		return "", err
 	}
@@ -18,7 +18,7 @@ func ZFTermInfoHandle(context *gin.Context, cb func(*model.User, string, string)
 	result, err := cb(user, context.PostForm("year"), context.PostForm("term"))
 
 	if err == errors.ERR_Session_Expired {
-		user, err = controller.LoginHandle(context, zfService.GetUser)
+		user, err = controller.LoginHandle(context, zfService.GetUser, false)
 		result, err = cb(user, context.PostForm("year"), context.PostForm("term"))
 	}
 

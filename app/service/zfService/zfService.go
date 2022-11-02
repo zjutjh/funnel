@@ -128,9 +128,9 @@ func GetEmptyRoomInfo(stu *model.User, year string, term string, campus string, 
 	return string(s), nil
 }
 
-func GetUser(username string, password string) (*model.User, error) {
+func GetUser(username string, password string, typeFlag bool) (*model.User, error) {
 	user, err := service.GetUser(service.ZFPrefix, username, password)
-	if err != nil {
+	if err != nil || typeFlag {
 		return login(username, password)
 	}
 	return user, err

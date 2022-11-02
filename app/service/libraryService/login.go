@@ -9,9 +9,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func GetUser(username string, password string) (*model.User, error) {
+func GetUser(username string, password string, typeFlag bool) (*model.User, error) {
 	user, err := service.GetUser(service.LibraryPrefix, username, password)
-	if err != nil {
+	if err != nil || typeFlag {
 		return login(username, password)
 	}
 	return user, err
