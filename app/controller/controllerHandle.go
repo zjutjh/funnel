@@ -40,8 +40,8 @@ func ErrorHandle(context *gin.Context, err error) {
 	context.Abort()
 }
 
-func LoginHandle(context *gin.Context, service func(username string, password string) (*model.User, error)) (*model.User, error) {
-	user, err := service(context.PostForm("username"), context.PostForm("password"))
+func LoginHandle(context *gin.Context, service func(username string, password string, typeFlag bool) (*model.User, error), typeFlag bool) (*model.User, error) {
+	user, err := service(context.PostForm("username"), context.PostForm("password"), typeFlag)
 	if err != nil {
 		ErrorHandle(context, err)
 		return nil, err

@@ -19,14 +19,14 @@ import (
 // @Router /student/libraryService/history/0 [post]
 func LibraryBorrowHistory(context *gin.Context) {
 
-	user, err := controller.LoginHandle(context, libraryService.GetUser)
+	user, err := controller.LoginHandle(context, libraryService.GetUser, false)
 	if err != nil {
 		return
 	}
 	books, err := libraryService.GetBorrowHistory(user)
 
 	if err == errors.ERR_Session_Expired {
-		user, err = controller.LoginHandle(context, libraryService.GetUser)
+		user, err = controller.LoginHandle(context, libraryService.GetUser, false)
 		books, err = libraryService.GetBorrowHistory(user)
 	}
 
@@ -37,7 +37,7 @@ func LibraryBorrowHistory(context *gin.Context) {
 	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(books))
 }
 
-// @Summary 图书馆当前借书记录
+// LibraryCurrentBorrow @Summary 图书馆当前借书记录
 // @Description 图书馆当前借书记录
 // @Tags 图书馆
 // @Produce  json
@@ -47,14 +47,14 @@ func LibraryBorrowHistory(context *gin.Context) {
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/libraryService/current [post]
 func LibraryCurrentBorrow(context *gin.Context) {
-	user, err := controller.LoginHandle(context, libraryService.GetUser)
+	user, err := controller.LoginHandle(context, libraryService.GetUser, false)
 	if err != nil {
 		return
 	}
 	books, err := libraryService.GetCurrentBorrow(user)
 
 	if err == errors.ERR_Session_Expired {
-		user, err = controller.LoginHandle(context, libraryService.GetUser)
+		user, err = controller.LoginHandle(context, libraryService.GetUser, false)
 		books, err = libraryService.GetCurrentBorrow(user)
 	}
 
@@ -65,7 +65,7 @@ func LibraryCurrentBorrow(context *gin.Context) {
 	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(books))
 }
 
-// @Summary 图书馆续借
+// LibraryReBorrow @Summary 图书馆续借
 // @Description 图书馆续借
 // @Tags 图书馆
 // @Produce  json
@@ -86,7 +86,7 @@ func LibraryReBorrow(context *gin.Context) {
 		return
 	}
 
-	user, err := controller.LoginHandle(context, libraryService.GetUser)
+	user, err := controller.LoginHandle(context, libraryService.GetUser, false)
 	if err != nil {
 		return
 	}
@@ -94,7 +94,7 @@ func LibraryReBorrow(context *gin.Context) {
 	err = libraryService.DoReBorrow(user, context.PostForm("libraryID"))
 
 	if err == errors.ERR_Session_Expired {
-		user, err = controller.LoginHandle(context, libraryService.GetUser)
+		user, err = controller.LoginHandle(context, libraryService.GetUser, false)
 		err = libraryService.DoReBorrow(user, context.PostForm("libraryID"))
 	}
 
@@ -103,4 +103,8 @@ func LibraryReBorrow(context *gin.Context) {
 		return
 	}
 	utils.ContextDataResponseJson(context, utils.SuccessResponseJson(nil))
+}
+
+func LibraryBind() {
+
 }

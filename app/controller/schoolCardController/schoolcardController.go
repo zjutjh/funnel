@@ -18,13 +18,13 @@ import (
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/card/balance [post]
 func CardBalance(context *gin.Context) {
-	user, err := controller.LoginHandle(context, schoolcardService.GetUser)
+	user, err := controller.LoginHandle(context, schoolcardService.GetUser, false)
 	if err != nil {
 		return
 	}
 	balance, err := schoolcardService.GetCurrentBalance(user)
 	if err == errors.ERR_Session_Expired {
-		user, err = controller.LoginHandle(context, schoolcardService.GetUser)
+		user, err = controller.LoginHandle(context, schoolcardService.GetUser, false)
 		balance, err = schoolcardService.GetCurrentBalance(user)
 	}
 
@@ -46,14 +46,14 @@ func CardBalance(context *gin.Context) {
 // @Failure 400 json  {"code":400,"data":null,"msg":""}
 // @Router /student/card/today [post]
 func CardToday(context *gin.Context) {
-	user, err := controller.LoginHandle(context, schoolcardService.GetUser)
+	user, err := controller.LoginHandle(context, schoolcardService.GetUser, false)
 	if err != nil {
 		return
 	}
 
 	balance, err := schoolcardService.GetCardToday(user)
 	if err == errors.ERR_Session_Expired {
-		user, err = controller.LoginHandle(context, schoolcardService.GetUser)
+		user, err = controller.LoginHandle(context, schoolcardService.GetUser, false)
 		balance, err = schoolcardService.GetCardToday(user)
 	}
 
@@ -86,14 +86,14 @@ func CardHistory(context *gin.Context) {
 		return
 	}
 
-	user, err := controller.LoginHandle(context, schoolcardService.GetUser)
+	user, err := controller.LoginHandle(context, schoolcardService.GetUser, false)
 	if err != nil {
 		return
 	}
 
 	history, err := schoolcardService.GetCardHistory(user, context.PostForm("year"), context.PostForm("month"))
 	if err == errors.ERR_Session_Expired {
-		user, err = controller.LoginHandle(context, schoolcardService.GetUser)
+		user, err = controller.LoginHandle(context, schoolcardService.GetUser, false)
 		history, err = schoolcardService.GetCardHistory(user, context.PostForm("year"), context.PostForm("month"))
 	}
 	if err != nil {
