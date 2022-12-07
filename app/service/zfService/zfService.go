@@ -9,10 +9,11 @@ import (
 	"funnel/app/utils/fetch"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
+	"net/url"
 )
 
 func GetLessonsTable(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfClassTable(), year, term)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfClassTable(), year, term, -1)
 	if err != nil {
 		return nil, err
 	}
@@ -21,17 +22,24 @@ func GetLessonsTable(stu *model.User, year string, term string) (interface{}, er
 	return model.TransformLessonTable(&f), err
 }
 func GetExamInfo(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term)
-	if err != nil {
-		return nil, err
+	var result model.ExamInfo
+	for i := 0; i < 6; i++ {
+		res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term, i)
+		if err != nil {
+			return nil, err
+		}
+		var f model.ExamRawInfo
+		err = json.Unmarshal([]byte(res), &f)
+		if err != nil {
+			continue
+			//return nil, err
+		}
+		result = append(result, model.TransformExamInfo(&f)...)
 	}
-	var f model.ExamRawInfo
-	err = json.Unmarshal([]byte(res), &f)
-	return model.TransformExamInfo(&f), err
-
+	return result, nil
 }
 func GetScoreDetail(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfScoreDetail(), year, term)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfScoreDetail(), year, term, -1)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +48,7 @@ func GetScoreDetail(stu *model.User, year string, term string) (interface{}, err
 	return model.TransformScoreDetailInfo(&f), err
 }
 func GetScore(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfScore(), year, term)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfScore(), year, term, -1)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +57,7 @@ func GetScore(stu *model.User, year string, term string) (interface{}, error) {
 	return model.TransformScoreInfo(&f), err
 }
 
-func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string) (string, error) {
+func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string, examIndex int) (string, error) {
 	f := fetch.Fetch{}
 	f.Init()
 	f.Cookie = append(f.Cookie, &stu.Session)
@@ -60,7 +68,13 @@ func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string) (strin
 	} else if term == "短" {
 		term = "16"
 	}
-	requestData := genTermRelatedInfoReqData(year, term)
+	var requestData url.Values
+	if examIndex != -1 {
+		// 因正方考试信息查询需要一个单独的参数来判断考试类型，所以需要examIndex来进行标识，为-1表示此次查询不是查考试信息
+		requestData = genTermExamInfoReqData(year, term, examIndex)
+	} else {
+		requestData = genTermRelatedInfoReqData(year, term)
+	}
 	s, err := f.PostForm(requestUrl, requestData)
 
 	if len(s) == 0 {
