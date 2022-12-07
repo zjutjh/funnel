@@ -7,6 +7,20 @@ import (
 	"net/url"
 )
 
+func genTermExamInfoReqData(year string, term string, index int) url.Values {
+	ksmc := []string{"EB4B492182673A1DE0550113465EF1CF",
+		"EB4ADB3912953991E0550113465EF1CF",
+		"EB4ADB39129D3991E0550113465EF1CF",
+		"EB4ADB3912993991E0550113465EF1CF",
+		"E9B7D38A2E1907CFE0550113465EF1CF",
+		"EA7B8C23F41E2384E0550113465EF1CF"}
+	return url.Values{
+		"xnm":                  {year},
+		"xqm":                  {term},
+		"ksmcdmb_id":           {ksmc[index]},
+		"kzlx":                 {"ck"},
+		"queryModel.showCount": {"100"}}
+}
 func genTermRelatedInfoReqData(year string, term string) url.Values {
 	return url.Values{
 		"xnm":                  {year},
