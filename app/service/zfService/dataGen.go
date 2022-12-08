@@ -8,7 +8,8 @@ import (
 )
 
 func genTermExamInfoReqData(year string, term string, index int) url.Values {
-	ksmc := []string{"EB4B492182673A1DE0550113465EF1CF",
+	ksmc := []string{"",
+		"EB4B492182673A1DE0550113465EF1CF",
 		"EB4ADB3912953991E0550113465EF1CF",
 		"EB4ADB39129D3991E0550113465EF1CF",
 		"EB4ADB3912993991E0550113465EF1CF",
