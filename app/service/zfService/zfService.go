@@ -23,7 +23,7 @@ func GetLessonsTable(stu *model.User, year string, term string) (interface{}, er
 }
 func GetExamInfo(stu *model.User, year string, term string) (interface{}, error) {
 	var result model.ExamInfo
-	for i := 0; i < 6; i++ {
+	for i := 0; i < 7; i++ {
 		res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term, i)
 		if err != nil {
 			return nil, err
