@@ -10,6 +10,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"net/url"
+	"sort"
 )
 
 func GetLessonsTable(stu *model.User, year string, term string) (interface{}, error) {
@@ -23,6 +24,7 @@ func GetLessonsTable(stu *model.User, year string, term string) (interface{}, er
 }
 func GetExamInfo(stu *model.User, year string, term string) (interface{}, error) {
 	var result model.ExamInfo
+	resultMap := make(map[string]*model.Exam)
 	for i := 0; i < 7; i++ {
 		res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term, i)
 		if err != nil {
@@ -34,8 +36,17 @@ func GetExamInfo(stu *model.User, year string, term string) (interface{}, error)
 			continue
 			//return nil, err
 		}
-		result = append(result, model.TransformExamInfo(&f)...)
+		examInfo := model.TransformExamInfo(&f)
+		for _, v := range examInfo {
+			resultMap[v.ExamTime] = v
+		}
 	}
+	for _, v := range resultMap {
+		result = append(result, v)
+	}
+	sort.SliceStable(result, func(i, j int) bool {
+		return result[i].ExamTime > result[j].ExamTime
+	})
 	return result, nil
 }
 func GetScoreDetail(stu *model.User, year string, term string) (interface{}, error) {
@@ -55,6 +66,15 @@ func GetScore(stu *model.User, year string, term string) (interface{}, error) {
 	var f model.ScoreRawInfo
 	err = json.Unmarshal([]byte(res), &f)
 	return model.TransformScoreInfo(&f), err
+}
+func GetMidTermScore(stu *model.User, year string, term string) (interface{}, error) {
+	res, err := fetchTermRelatedInfo(stu, zf.ZfMinTermScore(), year, term, -1)
+	if err != nil {
+		return nil, err
+	}
+	var f model.MidTermScoreRawInfo
+	err = json.Unmarshal([]byte(res), &f)
+	return model.TransformMidTermScoreInfo(&f), err
 }
 
 func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string, examIndex int) (string, error) {

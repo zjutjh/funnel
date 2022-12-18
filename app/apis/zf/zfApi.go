@@ -27,13 +27,15 @@ func ZfScore() string {
 func ZfScoreDetail() string {
 	return apis.ZF_URL + "cjcx/cjcx_cxXsKccjList.html?doType=query"
 }
-
+func ZfMinTermScore() string {
+	return apis.ZF_URL + "design/funcData_cxFuncDataList.html?func_widget_guid=5EF567BFD3CE243EE053A11310AC1252&gnmkdm=N305013"
+}
 func ZfEmptyClassRoom() string {
 	return apis.ZF_URL + "cdjy/cdjy_cxKxcdlb.html?doType=query"
 }
 func ZfUserInfo() string {
-	return apis.ZF_URL + "/xsxxxggl/xsgrxxwh_cxXsgrxx.html?gnmkdm=N100801&layout=default"
+	return apis.ZF_URL + "xsxxxggl/xsgrxxwh_cxXsgrxx.html?gnmkdm=N100801&layout=default"
 }
 func ZfPY() string {
-	return apis.ZF_URL + "/pyfagl/pyfaxxck_dyPyfaxx.html?id="
+	return apis.ZF_URL + "pyfagl/pyfaxxck_dyPyfaxx.html?id="
 }

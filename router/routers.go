@@ -19,6 +19,7 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 			{
 				term.POST("/score/info", zfController.GetScoreDetail)
 				term.POST("/score", zfController.GetScore)
+				term.POST("/midtermscore", zfController.GetMidTermScore)
 				term.POST("/table", zfController.GetClassTable)
 				term.POST("/exam", zfController.GetExamInfo)
 			}
