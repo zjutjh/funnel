@@ -3,7 +3,6 @@ package router
 import (
 	"funnel/app/controller/canteenController"
 	"funnel/app/controller/libraryController"
-	"funnel/app/controller/schoolCardController"
 	"funnel/app/controller/zfController"
 	"funnel/app/midware"
 	"github.com/gin-gonic/gin"
@@ -31,12 +30,6 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 			library.POST("/borrow/history", libraryController.LibraryBorrowHistory)
 			library.POST("/borrow/current", libraryController.LibraryCurrentBorrow)
 			library.POST("/borrow/reborrow", libraryController.LibraryReBorrow)
-		}
-		card := student.Group("/card", midware.CheckUsernamePassword)
-		{
-			card.POST("/balance", schoolCardController.CardBalance)
-			card.POST("/today", schoolCardController.CardToday)
-			card.POST("/history", schoolCardController.CardHistory)
 		}
 	}
 	canteen := r.Group("/canteen")
