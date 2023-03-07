@@ -8,6 +8,7 @@ import (
 	"funnel/app/model"
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
+	"funnel/config"
 	"net/http"
 	"strings"
 )
@@ -29,7 +30,17 @@ func login(username string, password string) (*model.User, error) {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
 
-	captcha, err := f.Get(apis.CAPTCHA_NEW_BREAKER_URL + f.Cookie[0].Value)
+	var URL string
+	if config.Redis.Exists("zf_url").Val() != 1 {
+		config.Redis.Set("zf_url", "bk", 0)
+	}
+	if strings.Compare(config.Redis.Get("zf_url").String(), "new") == 0 {
+		URL = apis.CAPTCHA_NEW_BREAKER_URL
+	} else {
+		URL = apis.CAPTCHA_BREAKER_URL
+	}
+
+	captcha, err := f.Get(URL + f.Cookie[0].Value)
 	if err != nil {
 		return nil, err
 	}
