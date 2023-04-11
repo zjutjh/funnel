@@ -22,7 +22,13 @@ func login(username string, password string) (*model.User, error) {
 	f := fetch.Fetch{}
 	f.Init()
 	_, err := f.Get(zf.ZfLoginHome())
-
+	//if strings.Contains(err.Error(), "context deadline exceeded") {
+	//	if strings.Compare(config.Redis.Get("zf_url").String(), "new") == 0 {
+	//		config.Redis.Set("zf_url", "bk", 0)
+	//	} else {
+	//		config.Redis.Set("zf_url", "new", 0)
+	//	}
+	//}
 	if err != nil {
 		return nil, err
 	}
@@ -31,9 +37,6 @@ func login(username string, password string) (*model.User, error) {
 	}
 
 	var URL string
-	if config.Redis.Exists("zf_url").Val() != 1 {
-		config.Redis.Set("zf_url", "bk", 0)
-	}
 	if strings.Compare(config.Redis.Get("zf_url").String(), "new") == 0 {
 		URL = apis.CAPTCHA_NEW_BREAKER_URL
 	} else {
@@ -49,7 +52,6 @@ func login(username string, password string) (*model.User, error) {
 	if captchaRes.Status != 0 {
 		return nil, errors.ERR_WRONG_Captcha
 	}
-
 	loginData := genLoginData(username, password, f)
 
 	s, err := f.PostForm(zf.ZfLoginHome(), loginData)

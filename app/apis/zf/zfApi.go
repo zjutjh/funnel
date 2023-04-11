@@ -32,7 +32,7 @@ func ZfExamInfo() string {
 	return ChooseURL() + "kwgl/kscx_cxXsksxxIndex.html?doType=query"
 }
 func ZfClassTable() string {
-	return ChooseURL() + "kbcx/xskbcx_cxXsKb.html"
+	return ChooseURL() + "kbcx/xskbcx_cxXsgrkb.html?gnmkdm=N2151&su="
 }
 func ZfScore() string {
 	return ChooseURL() + "cjcx/cjcx_cxDgXscj.html?doType=query"

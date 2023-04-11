@@ -2,7 +2,7 @@ package fetch
 
 import (
 	"crypto/tls"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -17,7 +17,7 @@ type Fetch struct {
 func (f *Fetch) InitUnSafe() {
 	f.client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-		Timeout:       time.Second * 30,
+		Timeout:       time.Second * 2,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
@@ -27,7 +27,7 @@ func (f *Fetch) InitUnSafe() {
 func (f *Fetch) Init() {
 	f.client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-		Timeout:       time.Second * 2,
+		Timeout:       time.Second * 10,
 	}
 }
 func (f *Fetch) SkipTlsCheck() {
@@ -41,7 +41,7 @@ func (f *Fetch) Get(url string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	s, err := ioutil.ReadAll(response.Body)
+	s, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (f *Fetch) PostForm(url string, requestData url.Values) ([]byte, error) {
 		return nil, err
 	}
 	f.Cookie = cookieMerge(f.Cookie, response.Cookies())
-	return ioutil.ReadAll(response.Body)
+	return io.ReadAll(response.Body)
 }
 
 func cookieMerge(cookieA []*http.Cookie, cookieB []*http.Cookie) []*http.Cookie {

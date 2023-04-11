@@ -14,7 +14,7 @@ import (
 )
 
 func GetLessonsTable(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfClassTable(), year, term, -1)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfClassTable()+stu.Username, year, term, -1)
 	if err != nil {
 		return nil, err
 	}
