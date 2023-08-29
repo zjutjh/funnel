@@ -9,15 +9,17 @@ import (
 )
 
 // LibraryBorrowHistory
-//  @Summary 图书馆历史借书记录
-//  @Description 图书馆借书记录（暂时只支持10本）
-//  @Tags 图书馆
-//  @Produce  json
-//  @Param username body string true "用户名"
-//  @Param password body string true "密码"
-//  @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
-//  @Failure 400 json  {"code":400,"data":null,"msg":""}
-//  @Router /student/libraryService/history/0 [post]
+//
+//	@Summary 图书馆历史借书记录
+//	@Description 图书馆借书记录（暂时只支持10本）
+//	@Tags 图书馆
+//	@Produce  json
+//	@Param username body string true "用户名"
+//	@Param password body string true "密码"
+//	@Param type body string true "登录类型"
+//	@Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
+//	@Failure 400 json  {"code":400,"data":null,"msg":""}
+//	@Router /student/libraryService/history/0 [post]
 func LibraryBorrowHistory(context *gin.Context) {
 
 	user, err := controller.LoginHandle(context, libraryService.GetUser, false)
@@ -39,15 +41,17 @@ func LibraryBorrowHistory(context *gin.Context) {
 }
 
 // LibraryCurrentBorrow
-//  @Summary 图书馆当前借书记录
-//  @Description 图书馆当前借书记录
-//  @Tags 图书馆
-//  @Produce  json
-//  @Param username body string true "用户名"
-//  @Param password body string true "密码"
-//  @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
-//  @Failure 400 json  {"code":400,"data":null,"msg":""}
-//  @Router /student/libraryService/current [post]
+//
+//	@Summary 图书馆当前借书记录
+//	@Description 图书馆当前借书记录
+//	@Tags 图书馆
+//	@Produce  json
+//	@Param username body string true "用户名"
+//	@Param password body string true "密码"
+//	@Param type body string true "登录类型"
+//	@Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
+//	@Failure 400 json  {"code":400,"data":null,"msg":""}
+//	@Router /student/libraryService/current [post]
 func LibraryCurrentBorrow(context *gin.Context) {
 	user, err := controller.LoginHandle(context, libraryService.GetUser, false)
 	if err != nil {
@@ -68,20 +72,22 @@ func LibraryCurrentBorrow(context *gin.Context) {
 }
 
 // LibraryReBorrow
-//  @Summary 图书馆续借
-//  @Description 图书馆续借
-//  @Tags 图书馆
-//  @Produce  json
-//  @Param username body string true "用户名"
-//  @Param password body string true "密码"
-//  @Param libraryID body string true "图书id"
-//  @Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
-//  @Failure 400 json  {"code":400,"data":null,"msg":""}
-//  @Router /student/libraryService/reborrow [post]
+//
+//	@Summary 图书馆续借
+//	@Description 图书馆续借
+//	@Tags 图书馆
+//	@Produce  json
+//	@Param username body string true "用户名"
+//	@Param password body string true "密码"
+//	@Param type body string true "登录类型"
+//	@Param libraryID body string true "图书id"
+//	@Success 200 json  {"code":200,"data":[{...}],"msg":"OK"}
+//	@Failure 400 json  {"code":400,"data":null,"msg":""}
+//	@Router /student/libraryService/reborrow [post]
 func LibraryReBorrow(context *gin.Context) {
 	isValid := utils.CheckPostFormEmpty(
 		context,
-		[]string{"username", "password", "libraryID"},
+		[]string{"username", "password", "type", "libraryID"},
 	)
 
 	if !isValid {

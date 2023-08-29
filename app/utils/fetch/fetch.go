@@ -2,6 +2,7 @@ package fetch
 
 import (
 	"crypto/tls"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -48,6 +49,21 @@ func (f *Fetch) Get(url string) ([]byte, error) {
 	return s, nil
 }
 
+func (f *Fetch) GetRedirect(url string) (*url.URL, error) {
+	response, err := f.GetRaw(url)
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode != 302 {
+		return nil, errors.New("network_error")
+	}
+	location, err := response.Location()
+	if err != nil {
+		return nil, err
+	}
+	return location, nil
+}
+
 func (f *Fetch) GetRaw(url string) (*http.Response, error) {
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -82,6 +98,18 @@ func (f *Fetch) PostFormRawAsynchronous(url string, requestData url.Values) (*ht
 		request.AddCookie(v)
 	}
 	return f.client.Do(request)
+}
+
+func (f *Fetch) PostFormRedirect(url string, requestData url.Values) (*url.URL, error) {
+	response, err := f.PostFormRaw(url, requestData)
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode != 302 {
+		return nil, errors.New("network_error")
+	}
+	f.Cookie = cookieMerge(f.Cookie, response.Cookies())
+	return response.Location()
 }
 
 func (f *Fetch) PostForm(url string, requestData url.Values) ([]byte, error) {

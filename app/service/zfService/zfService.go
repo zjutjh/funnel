@@ -3,6 +3,7 @@ package zfService
 import (
 	"encoding/json"
 	"funnel/app/apis/zf"
+	"funnel/app/controller"
 	"funnel/app/errors"
 	"funnel/app/model"
 	"funnel/app/service"
@@ -162,10 +163,15 @@ func GetEmptyRoomInfo(stu *model.User, year string, term string, campus string, 
 	return string(s), nil
 }
 
-func GetUser(username string, password string, typeFlag bool) (*model.User, error) {
+func GetUser(username, password string, loginType controller.LoginType, typeFlag bool) (*model.User, error) {
 	user, err := service.GetUser(service.ZFPrefix, username, password)
 	if err != nil || typeFlag {
-		return login(username, password)
+		switch loginType {
+		case controller.ZF:
+			return login(username, password)
+		case controller.OAUTH:
+			return loginByOauth(username, password)
+		}
 	}
 	return user, err
 }
