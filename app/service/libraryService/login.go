@@ -2,6 +2,7 @@ package libraryService
 
 import (
 	"funnel/app/apis/library"
+	"funnel/app/controller"
 	"funnel/app/errors"
 	"funnel/app/model"
 	"funnel/app/service"
@@ -9,7 +10,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func GetUser(username string, password string, typeFlag bool) (*model.User, error) {
+func GetUser(username, password string, loginType controller.LoginType, typeFlag bool) (*model.User, error) {
+	// TODO 这里登录类型尚未使用
 	user, err := service.GetUser(service.LibraryPrefix, username, password)
 	if err != nil || typeFlag {
 		return login(username, password)
