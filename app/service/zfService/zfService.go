@@ -82,6 +82,7 @@ func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string, examIn
 	f := fetch.Fetch{}
 	f.Init()
 	f.Cookie = append(f.Cookie, &stu.Session)
+	f.Cookie = append(f.Cookie, &stu.Route)
 	if term == "上" {
 		term = "3"
 	} else if term == "下" {
@@ -112,6 +113,7 @@ func GetTrainingPrograms(stu *model.User) ([]byte, error) {
 	f := fetch.Fetch{}
 	f.Init()
 	f.Cookie = append(f.Cookie, &stu.Session)
+	f.Cookie = append(f.Cookie, &stu.Route)
 	response, err := f.GetRaw(zf.ZfUserInfo())
 
 	if err != nil {
@@ -135,6 +137,7 @@ func GetEmptyRoomInfo(stu *model.User, year string, term string, campus string, 
 	f := fetch.Fetch{}
 	f.Init()
 	f.Cookie = append(f.Cookie, &stu.Session)
+	f.Cookie = append(f.Cookie, &stu.Route)
 	if term == "上" {
 		term = "3"
 	} else if term == "下" {

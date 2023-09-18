@@ -6,4 +6,5 @@ type User struct {
 	Username string
 	Password string
 	Session  http.Cookie
+	Route    http.Cookie
 }

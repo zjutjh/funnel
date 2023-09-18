@@ -121,12 +121,14 @@ func GetProgInfo(context *gin.Context) {
 
 	user, err := controller.LoginHandle(context, zfService.GetUser, false)
 	if err != nil {
+		controller.ErrorHandle(context, err)
 		return
 	}
 	result, err := zfService.GetTrainingPrograms(user)
 	if err == errors.ERR_SESSION_EXPIRES {
 		user, err = controller.LoginHandle(context, zfService.GetUser, false)
 		if err != nil {
+			controller.ErrorHandle(context, err)
 			return
 		}
 		result, err = zfService.GetTrainingPrograms(user)
