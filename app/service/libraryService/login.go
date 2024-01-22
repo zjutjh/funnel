@@ -37,5 +37,5 @@ func login(username string, password string) (*model.User, error) {
 	if len(f.Cookie) == 0 || err != nil {
 		return nil, errors.ERR_WRONG_PASSWORD
 	}
-	return service.SetUser(service.LibraryPrefix, username, password, f.Cookie[0])
+	return service.SetUser(service.LibraryPrefix, username, password, f.Cookie[0], nil)
 }

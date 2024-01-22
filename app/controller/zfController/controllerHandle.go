@@ -19,6 +19,10 @@ func ZFTermInfoHandle(context *gin.Context, cb func(*model.User, string, string)
 
 	if err == errors.ERR_Session_Expired {
 		user, err = controller.LoginHandle(context, zfService.GetUser, false)
+		if err != nil {
+			controller.ErrorHandle(context, err)
+			return nil, err
+		}
 		result, err = cb(user, context.PostForm("year"), context.PostForm("term"))
 	}
 

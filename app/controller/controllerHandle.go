@@ -29,6 +29,11 @@ func ErrorHandle(context *gin.Context, err error) {
 			exp = errors.SessionExpired
 			break
 		}
+	case errors.ERR_OAUTH_ERROR:
+		{
+			exp = errors.OauthError
+			break
+		}
 	}
 
 	println(err.Error())

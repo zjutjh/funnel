@@ -2,7 +2,8 @@ package fetch
 
 import (
 	"crypto/tls"
-	"errors"
+	"fmt"
+	errors2 "funnel/app/errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -18,7 +19,7 @@ type Fetch struct {
 func (f *Fetch) InitUnSafe() {
 	f.client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-		Timeout:       time.Second * 2,
+		Timeout:       time.Second * 20,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
@@ -28,7 +29,7 @@ func (f *Fetch) InitUnSafe() {
 func (f *Fetch) Init() {
 	f.client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
-		Timeout:       time.Second * 10,
+		Timeout:       time.Second * 20,
 	}
 }
 func (f *Fetch) SkipTlsCheck() {
@@ -55,7 +56,7 @@ func (f *Fetch) GetRedirect(url string) (*url.URL, error) {
 		return nil, err
 	}
 	if response.StatusCode != 302 {
-		return nil, errors.New("network_error")
+		return nil, errors2.ERR_OAUTH_ERROR
 	}
 	location, err := response.Location()
 	if err != nil {
@@ -106,7 +107,9 @@ func (f *Fetch) PostFormRedirect(url string, requestData url.Values) (*url.URL, 
 		return nil, err
 	}
 	if response.StatusCode != 302 {
-		return nil, errors.New("network_error")
+		fmt.Println(url)
+		fmt.Println(response.StatusCode)
+		return nil, errors2.ERR_WRONG_PASSWORD
 	}
 	f.Cookie = cookieMerge(f.Cookie, response.Cookies())
 	return response.Location()

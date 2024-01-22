@@ -34,10 +34,10 @@ func GetUser(prefix string, username string, password string) (*model.User, erro
 	return user, nil
 }
 
-func SetUser(prefix string, username string, password string, cookie *http.Cookie) (*model.User, error) {
-	user := model.User{Username: username, Password: password, Session: *cookie}
+func SetUser(prefix string, username string, password string, sessionCookie *http.Cookie, routeCookie *http.Cookie) (*model.User, error) {
+	user := model.User{Username: username, Password: password, Session: *sessionCookie, Route: *routeCookie}
 	userJson, _ := json.Marshal(user)
-	config.Redis.Set(getRediskey(prefix, username, password), string(userJson), cookie.Expires.Sub(time.Now().Add(time.Minute*5)))
+	config.Redis.Set(getRediskey(prefix, username, password), string(userJson), sessionCookie.Expires.Sub(time.Now().Add(time.Minute*5)))
 	return &user, nil
 }
 

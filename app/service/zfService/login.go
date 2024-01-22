@@ -37,15 +37,13 @@ func login(username string, password string) (*model.User, error) {
 	if len(f.Cookie) < 1 {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
-
 	var URL string
 	if strings.Compare(config.Redis.Get("zf_url").String(), "new") == 0 {
 		URL = apis.CAPTCHA_NEW_BREAKER_URL
 	} else {
 		URL = apis.CAPTCHA_BREAKER_URL
 	}
-
-	captcha, err := f.Get(URL + f.Cookie[0].Value)
+	captcha, err := f.Get(URL + "?session=" + f.Cookie[0].Value + "&route=" + f.Cookie[1].Value)
 	if err != nil {
 		return nil, err
 	}
@@ -67,16 +65,20 @@ func login(username string, password string) (*model.User, error) {
 	if strings.Contains(string(s), "用户名或密码不正确") {
 		return nil, errors.ERR_WRONG_PASSWORD
 	}
-	var cookie *http.Cookie
+	var sessionCookie *http.Cookie
+	var routeCookie *http.Cookie
 	for _, v := range f.Cookie {
 		if v.Name == "JSESSIONID" {
-			cookie = v
+			sessionCookie = v
+		}
+		if v.Name == "route" {
+			routeCookie = v
 		}
 	}
-	if cookie == nil {
+	if sessionCookie == nil {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
-	return service.SetUser(service.ZFPrefix, username, password, cookie)
+	return service.SetUser(service.ZFPrefix, username, password, sessionCookie, routeCookie)
 }
 
 func loginByOauth(username string, password string) (*model.User, error) {
@@ -120,14 +122,18 @@ func loginByOauth(username string, password string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	var cookie *http.Cookie
+	var sessionCookie *http.Cookie
+	var routeCookie *http.Cookie
 	for _, v := range f.Cookie {
 		if v.Name == "JSESSIONID" {
-			cookie = v
+			sessionCookie = v
+		}
+		if v.Name == "route" {
+			routeCookie = v
 		}
 	}
-	if cookie == nil {
+	if sessionCookie == nil {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
-	return service.SetUser(service.ZFPrefix, username, password, cookie)
+	return service.SetUser(service.ZFPrefix, username, password, sessionCookie, routeCookie)
 }
