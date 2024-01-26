@@ -37,13 +37,14 @@ func GetUser(prefix string, username string, password string) (*model.User, erro
 func SetUser(prefix string, username string, password string, sessionCookie *http.Cookie, routeCookie *http.Cookie) (*model.User, error) {
 	user := model.User{Username: username, Password: password, Session: *sessionCookie, Route: *routeCookie}
 	userJson, _ := json.Marshal(user)
-	config.Redis.Set(getRediskey(prefix, username, password), string(userJson), sessionCookie.Expires.Sub(time.Now().Add(time.Minute*5)))
+	config.Redis.Set(getRediskey(prefix, username, password), string(userJson), 5*time.Minute)
 	return &user, nil
 }
 
 func ForgetUser(prefix string, username string, password string) {
 	config.Redis.Del(getRediskey(prefix, username, password))
 }
+
 func ForgetAllUser(prefix string) {
 	res, _ := config.Redis.Keys(prefix + "*").Result()
 	for _, v := range res {
