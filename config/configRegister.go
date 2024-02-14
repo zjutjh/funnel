@@ -1,6 +1,7 @@
 package config
 
 import (
+	"funnel/config/logs"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
@@ -16,5 +17,6 @@ func init() {
 func SetupConfigs(r *gin.Engine) {
 	log.Print("Setup Configs....")
 	RedisInit()
+	logs.LogInit()
 	log.Print("Setup Configs Finish....")
 }
