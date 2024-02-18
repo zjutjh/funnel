@@ -14,13 +14,13 @@ import (
 //
 //var CANTEEN_URL = os.Getenv("CANTEEN_URL")
 
-var LIBRARY_URL = config.Config.GetString("library")
+var LIBRARY_URL string = config.Config.GetString("library")
 
-var CAPTCHA_BREAKER_URL = config.Config.GetString("captcha.breaker_url")
-var CAPTCHA_NEW_BREAKER_URL = config.Config.GetString("captcha.new_breaker_url")
+var CAPTCHA_BREAKER_URL string = config.Config.GetString("captcha.breaker_url")
+var CAPTCHA_NEW_BREAKER_URL string = config.Config.GetString("captcha.new_breaker_url")
 
-var ZF_URL = config.Config.GetString("zf.url")
-var ZF_Main_URL = config.Config.GetString("zf.main_url")
-var ZF_BK_URL = config.Config.GetString("zf.bk_url")
+var ZF_URL string = config.Config.GetString("zf.url")
+var ZF_Main_URL string = config.Config.GetString("zf.main_url")
+var ZF_BK_URL string = config.Config.GetString("zf.bk_url")
 
-var CANTEEN_URL = config.Config.GetString("canteen")
+var CANTEEN_URL string = config.Config.GetString("canteen")
