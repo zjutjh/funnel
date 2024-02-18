@@ -2,8 +2,8 @@ package logs
 
 import (
 	"fmt"
+	"funnel/config/config"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -30,31 +30,14 @@ func init() {
 	os.Mkdir("log", os.ModePerm)
 
 	logName := "funnel"
+	if config.Config.IsSet("log.name") {
+		logName = config.Config.GetString("log.name")
+	}
+
 	logLevel := "info"
-	maxAge := uint(14)
-	rotationTime := uint(1)
-
-	if os.Getenv("LOGS_NAME") != "" {
-		logName = os.Getenv("LOGS_NAME")
+	if config.Config.IsSet("log.level") {
+		logLevel = config.Config.GetString("log.level")
 	}
-	if os.Getenv("LOGS_LEVEL") != "" {
-		logLevel = os.Getenv("LOGS_LEVEL")
-	}
-	if os.Getenv("LOGS_MAX_AGE") != "" {
-		n, err := strconv.Atoi(os.Getenv("LOGS_MAX_AGE"))
-		if err != nil {
-			panic(err)
-		}
-		maxAge = uint(n)
-	}
-	if os.Getenv("LOGS_ROTATION_TIME") != "" {
-		n, err := strconv.Atoi(os.Getenv("LOGS_ROTATION_TIME"))
-		if err != nil {
-			panic(err)
-		}
-		rotationTime = uint(n)
-	}
-
 	if level, ok := logLevels[logLevel]; ok {
 		Log.SetLevel(level)
 		if logLevel != "debug" {
@@ -62,6 +45,16 @@ func init() {
 		}
 	} else {
 		Log.SetLevel(logrus.InfoLevel)
+	}
+
+	maxAge := uint(14)
+	if config.Config.IsSet("log.maxAge") {
+		maxAge = config.Config.GetUint("log.maxage")
+	}
+
+	rotationTime := uint(1)
+	if config.Config.IsSet("log.rotationTime") {
+		maxAge = config.Config.GetUint("log.rotationTime")
 	}
 
 	hook := newHook("./log/"+logName, maxAge, rotationTime)
