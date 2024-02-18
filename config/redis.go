@@ -1,47 +1,20 @@
 package config
 
 import (
-	"os"
-	"strconv"
-
+	redisConfig "funnel/config/redis"
 	"github.com/go-redis/redis"
 )
 
-var Redis = redis.Client{}
+var Redis *redis.Client
+var RedisInfo redisConfig.RedisConfig
 
-func RedisInit() *redis.Client {
-	REDIS_HOST := "localhost"
-	REDIS_PORT := "6379"
-	REDIS_PASSWORD := ""
-	REDIS_DB := 0
+func init() {
+	info := redisConfig.GetConfig()
 
-	if os.Getenv("REDIS_HOST") != "" {
-		REDIS_HOST = os.Getenv("REDIS_HOST")
-	}
-
-	if os.Getenv("REDIS_PORT") != "" {
-		REDIS_PORT = os.Getenv("REDIS_PORT")
-	}
-
-	if os.Getenv("REDIS_DB") != "" {
-		REDIS_DB, _ = strconv.Atoi(os.Getenv("REDIS_DB"))
-	}
-
-	if os.Getenv("REDIS_PASSWORD") != "" {
-		REDIS_PASSWORD = os.Getenv("REDIS_PASSWORD")
-	}
-
-	RedisClient := redis.NewClient(&redis.Options{
-		Addr:     REDIS_HOST + ":" + REDIS_PORT,
-		Password: REDIS_PASSWORD,
-		DB:       REDIS_DB,
+	Redis = redis.NewClient(&redis.Options{
+		Addr:     info.Host + ":" + info.Port,
+		Password: info.Password,
+		DB:       info.DB,
 	})
-
-	_, err := RedisClient.Ping().Result()
-
-	if err != nil {
-		panic("redis ping error")
-	}
-	Redis = *RedisClient
-	return RedisClient
+	RedisInfo = info
 }

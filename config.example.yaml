@@ -1,0 +1,19 @@
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  db: 0
+  user: root
+  pass:
+
+library:
+
+captcha:
+  breaker_url:
+  new_breaker_url:
+
+zf:
+  url:
+  main_url:
+  bk_url:
+
+canteen:

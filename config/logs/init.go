@@ -21,7 +21,7 @@ var logLevels = map[string]logrus.Level{
 	"debug": logrus.DebugLevel,
 }
 
-func LogInit() {
+func init() {
 	Log.Formatter = &logrus.JSONFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 		PrettyPrint:     true,
