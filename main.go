@@ -1,13 +1,13 @@
 package main
 
 import (
+	"funnel/config/config"
 	"funnel/router"
 	"github.com/gin-gonic/gin"
-	"os"
 )
 
 func main() {
 	r := gin.Default()
 	router.SetupRouter(r)
-	_ = r.Run(":" + os.Getenv("ROUTER_POST"))
+	_ = r.Run(":" + config.Config.GetString("port"))
 }
