@@ -19,9 +19,3 @@ zf:
   bk_url:
 
 canteen:
-
-log:
-  level: "info" #level有四个等级，主要使用debug和info
-  name: "funnel"
-  rotationTime: 1 #分割周期
-  maxAge: 14 #存活周期
