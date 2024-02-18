@@ -5,7 +5,6 @@ import (
 	"funnel/app/errors"
 	"funnel/app/model"
 	"funnel/app/utils"
-	"funnel/config/logs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,24 +17,17 @@ func ErrorHandle(context *gin.Context, err error) {
 	case errors.ERR_WRONG_PASSWORD:
 		{
 			exp = errors.WrongPassword
-			logs.WriteDebug(context, exp)
 			break
 		}
 	case errors.ERR_WRONG_Captcha:
 		{
 			exp = errors.CaptchaFailed
-			logs.WriteWarn(context, exp)
 			break
 		}
 	case errors.ERR_Session_Expired:
 		{
 			exp = errors.SessionExpired
-			logs.WriteWarn(context, exp)
 			break
-		}
-	default:
-		{
-			logs.WriteError(context, err)
 		}
 	}
 
