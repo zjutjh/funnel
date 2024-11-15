@@ -25,7 +25,7 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 			zf.POST("/room", zfController.GetRoomInfo)
 			zf.POST("/program", zfController.GetProgInfo)
 		}
-		library := student.Group("/library", midware.CheckUsernamePassword)
+		library := student.Group("/library")
 		{
 			library.POST("/borrow/history", libraryController.LibraryBorrowHistory)
 			library.POST("/borrow/current", libraryController.LibraryCurrentBorrow)

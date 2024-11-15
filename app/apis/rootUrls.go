@@ -14,7 +14,7 @@ import (
 //
 //var CANTEEN_URL = os.Getenv("CANTEEN_URL")
 
-var LIBRARY_URL string = config.Config.GetString("library")
+//var LIBRARY_URL string = config.Config.GetString("library")
 
 var CAPTCHA_BREAKER_URL string = config.Config.GetString("captcha.breaker_url")
 var CAPTCHA_NEW_BREAKER_URL string = config.Config.GetString("captcha.new_breaker_url")
