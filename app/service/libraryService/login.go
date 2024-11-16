@@ -3,23 +3,29 @@ package libraryService
 import (
 	"bytes"
 	"funnel/app/apis/library"
+	"funnel/app/errors"
+	"funnel/app/service/libraryService/request"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/go-resty/resty/v2"
 	"net/http"
+	"net/http/cookiejar"
+	"net/url"
 )
 
 // OAuthLogin 统一登陆
 func OAuthLogin(username string, password string) ([]*http.Cookie, error) {
-	client := resty.New()
+	client := request.New()
+	// 使用cookieJar管理cookie
+	cookieJar, _ := cookiejar.New(nil)
+	client.SetCookieJar(cookieJar)
+
 	// 1. 初始化请求
-	if _, err := client.R().
-		EnableTrace().
+	if _, err := client.Request().
 		Get(library.OAuthChaoXingInit); err != nil {
 		return nil, err
 	}
+
 	// 2. 登陆参数生成
-	resp, err := client.R().
-		EnableTrace().
+	resp, err := client.Request().
 		Get(library.LoginFromOAuth)
 	if err != nil {
 		return nil, err
@@ -46,8 +52,7 @@ func OAuthLogin(username string, password string) ([]*http.Cookie, error) {
 		"_eventId":   "submit",
 	}
 	// 3. 发送登陆请求
-	resp, err = client.R().
-		EnableTrace().
+	resp, err = client.Request().
 		SetFormData(loginParams).
 		Post(library.LoginFromOAuth)
 	if err != nil {
@@ -59,13 +64,18 @@ func OAuthLogin(username string, password string) ([]*http.Cookie, error) {
 	// resty只能自动处理header.Location中的重定向
 	redirect := GetRedirectLocation(resp.String())
 
-	resp, err = client.R().Get(redirect)
+	resp, err = client.Request().
+		Get(redirect)
 	if err != nil {
 		return nil, err
 	}
-	cookies := resp.Cookies()
-	if !CheckCookie(cookies) {
-		return nil, err
+
+	// 5. 提取指定域名下的session并构造cookie列表
+	u, _ := url.Parse(library.BaseUrl)
+	for _, cookie := range cookieJar.Cookies(u) {
+		if cookie.Name == "SESSION" {
+			return []*http.Cookie{cookie}, nil
+		}
 	}
-	return resp.Cookies(), nil
+	return nil, errors.ERR_WRONG_PASSWORD
 }
