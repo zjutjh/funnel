@@ -1,7 +1,6 @@
 package router
 
 import (
-	"funnel/app/controller/canteenController"
 	"funnel/app/controller/libraryController"
 	"funnel/app/controller/zfController"
 	"funnel/app/midware"
@@ -31,10 +30,6 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 			library.POST("/borrow/current", libraryController.LibraryCurrentBorrow)
 			library.POST("/borrow/reborrow", libraryController.LibraryReBorrow)
 		}
-	}
-	canteen := r.Group("/canteen")
-	{
-		canteen.GET("/flow", canteenController.Flow) // 关于餐厅客流量的路由
 	}
 
 	return r

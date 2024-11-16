@@ -11,8 +11,6 @@ import (
 //
 //var ZF_Main_URL = os.Getenv("ZF_URL")
 //var ZF_BK_URL = os.Getenv("ZF_URL_BK")
-//
-//var CANTEEN_URL = os.Getenv("CANTEEN_URL")
 
 var LIBRARY_URL string = config.Config.GetString("library")
 
@@ -22,5 +20,3 @@ var CAPTCHA_NEW_BREAKER_URL string = config.Config.GetString("captcha.new_breake
 var ZF_URL string = config.Config.GetString("zf.url")
 var ZF_Main_URL string = config.Config.GetString("zf.main_url")
 var ZF_BK_URL string = config.Config.GetString("zf.bk_url")
-
-var CANTEEN_URL string = config.Config.GetString("canteen")
