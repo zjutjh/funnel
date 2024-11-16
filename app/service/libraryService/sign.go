@@ -2,14 +2,13 @@ package libraryService
 
 import (
 	"funnel/app/apis/library"
+	"funnel/app/service/libraryService/request"
 	"funnel/app/utils/security"
-	"github.com/go-resty/resty/v2"
 )
 
 // OauthLoginGetPublicKey 获取加密密钥
-func OauthLoginGetPublicKey(client *resty.Client) ([]byte, error) {
-	resp, err := client.R().
-		EnableTrace().
+func OauthLoginGetPublicKey(client request.Client) ([]byte, error) {
+	resp, err := client.Request().
 		Get(library.OAuthPublicKey)
 	if err != nil {
 		return []byte{}, err
@@ -18,7 +17,7 @@ func OauthLoginGetPublicKey(client *resty.Client) ([]byte, error) {
 }
 
 // GetEncryptedPwd 密码加密
-func GetEncryptedPwd(client *resty.Client, password string) (string, error) {
+func GetEncryptedPwd(client request.Client, password string) (string, error) {
 	key, err := OauthLoginGetPublicKey(client)
 	if err != nil {
 		return "", err
