@@ -2,7 +2,8 @@ package libraryService
 
 import (
 	"funnel/app/apis/library"
-	"github.com/go-resty/resty/v2"
+	"funnel/app/errors"
+	"funnel/app/service/libraryService/request"
 )
 
 // GetBorrowHistory 获取图书馆当前借书记录
@@ -10,10 +11,12 @@ func GetBorrowHistory(username string, password string, page int) (interface{}, 
 	var ret Result
 	cookies, err := OAuthLogin(username, password)
 	if err != nil {
-		return nil, err
+		return nil, errors.ERR_WRONG_PASSWORD
 	}
-	client := resty.New()
-	_, err = client.R().
+
+	client := request.New()
+
+	_, err = client.Request().
 		SetBody(map[string]interface{}{
 			"page":          page,
 			"rows":          10,

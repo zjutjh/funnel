@@ -43,7 +43,7 @@ func login(username string, password string) (*model.User, error) {
 	} else {
 		URL = apis.CAPTCHA_BREAKER_URL
 	}
-	captcha, err := f.Get(URL + "?session=" + f.Cookie[0].Value + "&route=" + f.Cookie[1].Value)
+	captcha, err := f.Get(URL + "?request=" + f.Cookie[0].Value + "&route=" + f.Cookie[1].Value)
 	if err != nil {
 		return nil, err
 	}
