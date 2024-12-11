@@ -25,7 +25,6 @@ func GetLessonsTable(stu *model.User, year string, term string) (interface{}, er
 }
 func GetExamInfo(stu *model.User, year string, term string) (interface{}, error) {
 	var result model.ExamInfo
-	resultMap := make(map[string]*model.Exam)
 	for i := 0; i < 7; i++ {
 		res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term, i)
 		if err != nil {
@@ -38,12 +37,7 @@ func GetExamInfo(stu *model.User, year string, term string) (interface{}, error)
 			//return nil, err
 		}
 		examInfo := model.TransformExamInfo(&f)
-		for _, v := range examInfo {
-			resultMap[v.ExamTime] = v
-		}
-	}
-	for _, v := range resultMap {
-		result = append(result, v)
+		result = append(result, examInfo...)
 	}
 	sort.SliceStable(result, func(i, j int) bool {
 		return result[i].ExamTime > result[j].ExamTime
