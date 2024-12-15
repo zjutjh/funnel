@@ -108,7 +108,7 @@ func loginByOauth(username string, password string) (*model.User, error) {
 	}
 	getRedirectUrl2, err := f.GetRedirect(getRedirectUrl1.String())
 	if err != nil {
-		return nil, err
+		return nil, errors.ERR_OAUTH_NOT_UPDATE
 	}
 	getRedirectUrl3, err := f.GetRedirect(getRedirectUrl2.String())
 	if err != nil {

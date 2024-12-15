@@ -2,7 +2,6 @@ package fetch
 
 import (
 	"crypto/tls"
-	"fmt"
 	errors2 "funnel/app/errors"
 	"io"
 	"net/http"
@@ -56,7 +55,7 @@ func (f *Fetch) GetRedirect(url string) (*url.URL, error) {
 		return nil, err
 	}
 	if response.StatusCode != 302 {
-		return nil, errors2.ERR_OAUTH_ERROR
+		return nil, errors2.ERR_UNKNOWN_ERROR
 	}
 	location, err := response.Location()
 	if err != nil {
@@ -107,8 +106,6 @@ func (f *Fetch) PostFormRedirect(url string, requestData url.Values) (*url.URL, 
 		return nil, err
 	}
 	if response.StatusCode != 302 {
-		fmt.Println(url)
-		fmt.Println(response.StatusCode)
 		return nil, errors2.ERR_WRONG_PASSWORD
 	}
 	f.Cookie = cookieMerge(f.Cookie, response.Cookies())
