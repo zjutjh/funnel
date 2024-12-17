@@ -8,9 +8,9 @@ import (
 )
 
 type currentBorrowData struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Page     int    `json:"page" default:"1"`
+	Username string `form:"username" json:"username" binding:"required"`
+	Password string `form:"password" json:"password" binding:"required"`
+	Page     int    `form:"page" json:"page"  default:"1"`
 }
 
 // LibraryCurrentBorrow 图书馆当前借书记录
