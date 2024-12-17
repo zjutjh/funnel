@@ -14,3 +14,4 @@ var WrongPassword = HttpResponseError{412, "密码错误"}
 var CaptchaFailed = HttpResponseError{413, "验证码错误"}
 var SessionExpired = HttpResponseError{414, "缓存过期"}
 var OauthError = HttpResponseError{415, "缓存过期"}
+var OAuthNotUpdate = HttpResponseError{416, "统一密码未更新"}

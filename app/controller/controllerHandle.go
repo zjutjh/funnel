@@ -17,17 +17,22 @@ func ErrorHandle(context *gin.Context, err error) {
 	case errors.ERR_WRONG_PASSWORD:
 		{
 			exp = errors.WrongPassword
-			break
 		}
 	case errors.ERR_WRONG_Captcha:
 		{
 			exp = errors.CaptchaFailed
-			break
 		}
 	case errors.ERR_Session_Expired:
 		{
 			exp = errors.SessionExpired
-			break
+		}
+	case errors.ERR_OAUTH_NOT_UPDATE:
+		{
+			exp = errors.OAuthNotUpdate
+		}
+	default:
+		{
+			exp = errors.UnKnown
 		}
 	}
 
