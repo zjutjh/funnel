@@ -8,9 +8,9 @@ import (
 )
 
 type borrowHistoryData struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Page     int    `json:"page" default:"1"`
+	Username string `json:"username" form:"username" binding:"required"`
+	Password string `json:"password" form:"password" binding:"required"`
+	Page     int    `json:"page" form:"page" default:"1"`
 }
 
 // LibraryBorrowHistory 图书馆历史借书记录
