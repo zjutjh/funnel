@@ -28,5 +28,5 @@ func GetBorrowHistory(username string, password string, page int) (interface{}, 
 		SetCookies(cookies).
 		SetResult(&ret).
 		Post(library.BorrowHistoryList)
-	return ret.Data, nil
+	return ret.Data.SearchResult, nil
 }
