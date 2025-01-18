@@ -59,6 +59,9 @@ func publicKeyFromHex(modulusHexString string, exponent int) *rsa.PublicKey {
 
 func encryptString(msg string, pub *rsa.PublicKey) string {
 	result := encrypt([]byte(msg), pub)
+	if len(result) == 0 {
+		return ""
+	}
 	hexString := hex.EncodeToString(result[0])
 	for i := 1; i < len(result); i++ {
 		hexString += " " + hex.EncodeToString(result[i])
@@ -68,13 +71,6 @@ func encryptString(msg string, pub *rsa.PublicKey) string {
 
 func chunkSize(pub *rsa.PublicKey) int {
 	return 2 * (pub.N.BitLen()/16 - 1)
-}
-
-func max(l int, r int) int {
-	if l > r {
-		return l
-	}
-	return r
 }
 
 // encrypt encrypts msg using pub and returns the ciphertext as a big integer.
