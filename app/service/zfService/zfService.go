@@ -77,12 +77,20 @@ func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string, examIn
 	f.Init()
 	f.Cookie = append(f.Cookie, &stu.Session)
 	f.Cookie = append(f.Cookie, &stu.Route)
+	// 学年参数转译
+	if year == "全" {
+		year = ""
+	}
+
+	// 学期参数转译
 	if term == "上" {
 		term = "3"
 	} else if term == "下" {
 		term = "12"
 	} else if term == "短" {
 		term = "16"
+	} else if term == "全" {
+		term = ""
 	}
 	var requestData url.Values
 	if examIndex != -1 {

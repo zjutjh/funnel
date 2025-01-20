@@ -26,5 +26,5 @@ func GetCurrentBorrow(username string, password string, page int) (interface{}, 
 		SetCookies(cookies).
 		SetResult(&ret).
 		Post(library.CurrentLoanList)
-	return ret.Data, nil
+	return ret.Data.SearchResult, nil
 }
