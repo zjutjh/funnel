@@ -16,6 +16,9 @@ func TransformScoreInfo(raw *ScoreRawInfo) ScoreInfo {
 				SubmitName:  value.Tjrxm,
 				LessonType:  value.Kcxzmc,
 				ExamType:    value.Ksxz,
+				SchoolTerm:  value.Xqmmc,
+				SchoolYear:  value.Xnmmc,
+				Key:         value.Key,
 			})
 	}
 
@@ -34,6 +37,9 @@ type Score struct {
 	ExamType    string `json:"examType"`
 	SubmitTime  string `json:"submitTime"`
 	SubmitName  string `json:"submitName"`
+	SchoolTerm  string `json:"schoolTerm"`
+	SchoolYear  string `json:"schoolYear"`
+	Key         string `json:"key"`
 }
 
 type ScoreInfo []*Score
@@ -54,5 +60,8 @@ type ScoreRawInfo struct {
 		Xf     string
 		Tjrxm  string
 		Tjsj   string
+		Key    string
+		Xnmmc  string
+		Xqmmc  string
 	}
 }
