@@ -34,7 +34,7 @@ func login(username string, password string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(f.Cookie) < 1 {
+	if len(f.Cookie) < 2 {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
 	var URL string
