@@ -24,21 +24,16 @@ func GetLessonsTable(stu *model.User, year string, term string) (interface{}, er
 	return model.TransformLessonTable(&f), err
 }
 func GetExamInfo(stu *model.User, year string, term string) (interface{}, error) {
-	var result model.ExamInfo
-	for i := 0; i < 7; i++ {
-		res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term, i)
-		if err != nil {
-			return nil, err
-		}
-		var f model.ExamRawInfo
-		err = json.Unmarshal([]byte(res), &f)
-		if err != nil {
-			continue
-			//return nil, err
-		}
-		examInfo := model.TransformExamInfo(&f)
-		result = append(result, examInfo...)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term, 0)
+	if err != nil {
+		return nil, err
 	}
+	var f model.ExamRawInfo
+	err = json.Unmarshal([]byte(res), &f)
+	if err != nil {
+		return nil, err
+	}
+	result := model.TransformExamInfo(&f)
 	sort.SliceStable(result, func(i, j int) bool {
 		return result[i].ExamTime > result[j].ExamTime
 	})
