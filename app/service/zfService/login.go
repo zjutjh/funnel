@@ -115,7 +115,11 @@ func loginByOauth(username string, password string) (*model.User, error) {
 		SetFormData(loginData).
 		Post(resp.RawResponse.Request.URL.String())
 
-	if err != nil && !errorss.Is(err, loginSuccess) {
+	if !errorss.Is(err, loginSuccess) {
+		if err != nil {
+			return nil, err
+		}
+		err = CheckLogin(resp)
 		return nil, err
 	}
 
