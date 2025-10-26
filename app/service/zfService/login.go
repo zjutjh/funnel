@@ -10,9 +10,10 @@ import (
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
 	"funnel/config"
-	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 type captchaServerResponse struct {

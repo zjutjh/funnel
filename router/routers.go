@@ -4,6 +4,7 @@ import (
 	"funnel/app/controller/libraryController"
 	"funnel/app/controller/zfController"
 	"funnel/app/midware"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,7 +12,7 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 
 	student := r.Group("/student")
 	{
-		zf := student.Group("/zf", midware.CheckUsernamePassword)
+		zf := student.Group("/zf", midware.CheckLoginForm)
 		{
 			term := zf.Group("", midware.CheckTermInfoForm)
 			{

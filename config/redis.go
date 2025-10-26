@@ -2,6 +2,8 @@ package config
 
 import (
 	redisConfig "funnel/config/redis"
+	"time"
+
 	"github.com/go-redis/redis"
 )
 
@@ -17,4 +19,10 @@ func init() {
 		DB:       info.DB,
 	})
 	RedisInfo = info
+
+	Redis.Set("CONNECTION_TEST", "CONNECTION_TEST", time.Second)
+	redisVal, err := Redis.Get("CONNECTION_TEST").Result()
+	if err != nil || redisVal != "CONNECTION_TEST" {
+		panic("Redis connection failed")
+	}
 }
