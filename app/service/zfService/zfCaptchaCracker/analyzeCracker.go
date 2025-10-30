@@ -12,8 +12,6 @@ import (
 	"time"
 )
 
-// ! NOT READY FOR PRODUCTION USE !
-
 // AnalyzeCracker is a ZfCaptchaCracker
 type AnalyzeCracker struct {
 	labConverter RgbTOLabConverter

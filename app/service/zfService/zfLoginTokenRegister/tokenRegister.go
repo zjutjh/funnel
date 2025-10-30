@@ -68,11 +68,12 @@ func (r *ZFLoginTokenRegister) RunAndWaitCaptchaBg() (image.Image, error) {
 }
 
 // SolveAndSubmit 提交验证码结果 如果请求正常并通过验证则返回 true
+// 如果验证码通过而其它异常 则第一个仍为 true 因验证码破解失败是常态此可方便外部定位
 // 参数 captchaSolution 是破解器返回的轨迹包字符串
 // 这是一个耗时操作
 func (r *ZFLoginTokenRegister) SolveAndSubmit(captchaSolution string) (bool, error) {
 	// 获取 rtk 令牌
-	rtk, err := r.GetRtkToken()
+	rtk, err := r.getRtkToken()
 	if err != nil {
 		return false, err
 	}
@@ -83,6 +84,10 @@ func (r *ZFLoginTokenRegister) SolveAndSubmit(captchaSolution string) (bool, err
 	}
 	if !isPassed {
 		return false, fmt.Errorf("captcha not passed") // TODO RETRY
+	}
+	// 获取密码加密密钥
+	if err := r.getCryptoKey(); err != nil {
+		return true, err
 	}
 	return true, nil
 }
@@ -110,6 +115,13 @@ func (r *ZFLoginTokenRegister) getInitialSession() error {
 	if r.CookieJSESSIONID == "" || r.CookieRoute == "" {
 		return fmt.Errorf("cannot get JSESSIONID or route from login page")
 	}
+	// 使用正则表达式提取 CSRFToken
+	re := regexp.MustCompile("<input[^>]+id=\"csrftoken\"[^>]+value=\"([^\"]+)\"")
+	matches := re.FindStringSubmatch(string(resp.Body()))
+	if len(matches) < 2 {
+		return fmt.Errorf("cannot find CSRFToken in login page")
+	}
+	r.CSRFToken = matches[1]
 	return nil
 }
 
@@ -176,7 +188,7 @@ func (r *ZFLoginTokenRegister) downloadCaptchaImg(imgId, imtk, t string) (image.
 }
 
 // GetRtkToken 下载包含 rtk 令牌的 JS 文件并提取 rtk
-func (r *ZFLoginTokenRegister) GetRtkToken() (string, error) {
+func (r *ZFLoginTokenRegister) getRtkToken() (string, error) {
 	cookie := fmt.Sprintf("JSESSIONID=%s; route=%s", r.CookieJSESSIONID, r.CookieRoute)
 	resp, err := r.restyClient.R().
 		SetHeader("Cookie", cookie).
@@ -196,6 +208,30 @@ func (r *ZFLoginTokenRegister) GetRtkToken() (string, error) {
 	}
 	// 由于正则捕获组从索引 1 开始，因此返回 matches[1]
 	return matches[1], nil
+}
+
+func (r *ZFLoginTokenRegister) getCryptoKey() error {
+
+	cookie := fmt.Sprintf("JSESSIONID=%s; route=%s", r.CookieJSESSIONID, r.CookieRoute)
+	var payload struct {
+		Modulus  string `json:"modulus"`
+		Exponent string `json:"exponent"`
+	}
+
+	resp, err := r.restyClient.R().
+		SetHeader("Cookie", cookie).
+		SetResult(&payload).
+		Get(r.hostUrl + "/jwglxt/xtgl/login_getPublicKey.html")
+
+	if err != nil || resp.IsError() {
+		return fmt.Errorf("cannot get crypto keys: %w", err) // ERR_HANDLE_4
+	}
+	r.CryptoModulus = payload.Modulus
+	r.CryptoExponent = payload.Exponent
+	if r.CryptoModulus == "" || r.CryptoExponent == "" {
+		return fmt.Errorf("crypto keys empty")
+	}
+	return nil
 }
 
 // submitCaptcha 提交破解得到的验证码轨迹包
