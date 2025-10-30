@@ -1,10 +1,8 @@
 package loginTokenManager
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -32,18 +30,24 @@ type LoginTokenManager struct {
 	getAfterLastActMt int32           // 上次主动维护后进行的请求数
 }
 
-func (m *LoginTokenManager) Init(host string, ctx context.Context, wg *sync.WaitGroup) {
+var LoginTkMgr *LoginTokenManager = &LoginTokenManager{}
+
+func Init(host string) {
+	LoginTkMgr.Init(host)
+}
+
+func (m *LoginTokenManager) Init(host string) {
 	m.tokenPool = &loginTokenPool{}
 	m.hostUrl = host
-	m.preferredTokenCount = 100
-	m.maxResisters = 20
+	m.preferredTokenCount = 50
+	m.maxResisters = 10
 	m.currentRunningResisters = 0
 	m.tokenExpirationTimeSec = 2 * 60 * 60
 	m.routineMaintenanceSec = 10
 	m.activeMaintenanceEvery = 5
 	m.getAfterLastActMt = 0
 
-	go m.runPoolRoutineMt(ctx, wg)
+	go m.runPoolRoutineMt()
 }
 
 func (m *LoginTokenManager) GetAToken() (*LoginToken, error) {
@@ -74,24 +78,20 @@ func (m *LoginTokenManager) getTokenFromPool() (*LoginToken, error) {
 }
 
 // 启动定时池维护
-func (m *LoginTokenManager) runPoolRoutineMt(ctx context.Context, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func (m *LoginTokenManager) runPoolRoutineMt() {
 	ticker := time.NewTicker(time.Duration(m.routineMaintenanceSec) * time.Second) // 定时触发
 	defer ticker.Stop()                                                            // 确保 ticker 在函数退出时被停止
 
-	for {
-		select {
-		case <-ctx.Done(): // 监听退出信号
-			return
-		case <-ticker.C:
-			log.Println("Routine Mt")
-			m.poolMaintenance()
-		}
+	for range ticker.C {
+		log.Println("Routine Mt")
+		m.poolMaintenance()
 	}
 }
 
-// 运行池维护
+// 运行池维护 以下三种情况会触发池维护:
+// 1. 定时维护
+// 2. 主动维护 (每 n 次 get 请求触发一次)
+// 3. 注册器完成后检查池状态发现池不满时
 func (m *LoginTokenManager) poolMaintenance() {
 
 	log.Printf("Pool Mt %d\n", m.tokenPool.Size())
@@ -122,12 +122,17 @@ func (m *LoginTokenManager) callRegister(preferredCount int32) {
 	for i := int32(0); i < preferredCount; i++ {
 		go func() {
 			atomic.AddInt32(&m.currentRunningResisters, 1) // 正在运行的注册器数量加一
-			log.Println("RUN REG")
+			log.Println("RUN REG NOW:", m.currentRunningResisters)
 			token, err := RunRegister(m.hostUrl)
 			if err == nil {
 				m.tokenPool.Add(&token)
 				log.Println("POOL ADD NOW:", m.tokenPool.Size())
 			} // TODO: ERROR LOG NEEDED
+			log.Printf("REG FINISH: %v\n", err)
+			if m.tokenPool.Size() < m.preferredTokenCount &&
+				atomic.LoadInt32(&m.currentRunningResisters) < m.maxResisters {
+				m.poolMaintenance() // 池不满且有注册器名额时 继续维护池
+			}
 			defer atomic.AddInt32(&m.currentRunningResisters, -1) // 正在运行的注册器数量减一
 		}()
 	}

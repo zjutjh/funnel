@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/png"
 	"math"
 	"math/rand"
-	"os"
 	"time"
 )
 
@@ -24,14 +22,6 @@ func (c *AnalyzeCracker) Init(config string) error {
 }
 
 func (c *AnalyzeCracker) Crack(img image.Image) (string, error) {
-
-	if file, err := os.Create("debug_bg.png"); err == nil {
-		png.Encode(file, img)
-		file.Close()
-	}
-	fmt.Print("input interest: ")
-	fmt.Scanln(&c.interest)
-
 	pos, err := c.findGapLeftEdge(img)
 	if err != nil {
 		return "", err

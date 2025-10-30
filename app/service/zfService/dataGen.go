@@ -1,11 +1,16 @@
 package zfService
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"encoding/base64"
+	"encoding/hex"
 	"funnel/app/apis/oauth"
-	"funnel/app/apis/zf"
 	"funnel/app/utils/fetch"
 	"funnel/app/utils/security"
+	"math/big"
 	"net/url"
+	"strconv"
 )
 
 func genTermExamInfoReqData(year string, term string, index int) url.Values {
@@ -33,13 +38,29 @@ func genTermRelatedInfoReqData(year string, term string) url.Values {
 		"xsdm":                 {}}
 }
 
-func genLoginData(username, password string, f fetch.Fetch) url.Values {
-	s, _ := f.Get(zf.ZfLoginGetPublickey())
-	encodePassword, _ := security.GetEncodePassword(s, []byte(password))
-	return url.Values{
-		"yhm": {username},
-		"mm":  {encodePassword}}
+func encryptPassword(password, modulus, exponent string) (string, error) {
+	nString, _ := base64.StdEncoding.DecodeString(modulus)
+	n, _ := new(big.Int).SetString(hex.EncodeToString(nString), 16)
+	eString, _ := base64.StdEncoding.DecodeString(exponent)
+	e, _ := strconv.ParseInt(hex.EncodeToString(eString), 16, 32)
+	pub := rsa.PublicKey{E: int(e), N: n}
+	cc, err := rsa.EncryptPKCS1v15(rand.Reader, &pub, []byte(password))
+	return base64.StdEncoding.EncodeToString(cc), err
 }
+
+// func genLoginData(username, encryptedPwd string) url.Values {
+// 	return url.Values{
+// 		"yhm": {username},
+// 		"mm":  {encryptedPwd}}
+// }
+
+// func genLoginData(username, password string, f fetch.Fetch) url.Values {
+// 	s, _ := f.Get(zf.ZfLoginGetPublickey())
+// 	encodePassword, _ := security.GetEncodePassword(s, []byte(password))
+// 	return url.Values{
+// 		"yhm": {username},
+// 		"mm":  {encodePassword}}
+// }
 
 func genOauthLoginData(username, password, execution string, f *fetch.Fetch) url.Values {
 	s, _ := f.Get(oauth.OauthLoginGetPublickey())

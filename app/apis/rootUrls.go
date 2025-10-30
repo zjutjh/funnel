@@ -17,6 +17,7 @@ import (
 var CAPTCHA_BREAKER_URL string = config.Config.GetString("captcha.breaker_url")
 var CAPTCHA_NEW_BREAKER_URL string = config.Config.GetString("captcha.new_breaker_url")
 
+var ZF_HOST string = config.Config.GetString("zf.host")
 var ZF_URL string = config.Config.GetString("zf.url")
 var ZF_Main_URL string = config.Config.GetString("zf.main_url")
 var ZF_BK_URL string = config.Config.GetString("zf.bk_url")

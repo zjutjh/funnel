@@ -2,10 +2,10 @@ package loginTokenManager
 
 import (
 	"fmt"
+	"funnel/app/service/zfService/zfCaptchaCracker"
+	"funnel/app/service/zfService/zfLoginTokenRegister"
 	"image"
 	"time"
-	"zfCaptchaCracker/zfCaptchaCracker"
-	"zfCaptchaCracker/zfLoginTokenRegister"
 )
 
 func RunRegister(host string) (LoginToken, error) {

@@ -41,7 +41,7 @@ func (r *ZFLoginTokenRegister) Init(hostUrl string, ua string) {
 	r.userAgent = ua
 	r.appVersionUA = ua
 	r.instanceId = "zfcaptchaLogin" // 抓包获取的固定值 写死的常量
-	r.restyClient = resty.New()
+	r.restyClient = resty.New().SetTimeout(3 * time.Second)
 	r.restyClient.SetHeader("User-Agent", ua)
 	r.restyClient.SetCookieJar(nil)
 }
