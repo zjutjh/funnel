@@ -14,13 +14,14 @@ import (
 var ZFPrefix = "funnel-ZF-"
 var LibraryPrefix = "funnel-Library-"
 var CardPrefix = "funnel-Card-"
+var ZFLoginTkPrefix = "funnel-ZFLoginTk"
 
-func getRediskey(prefix, username, password string) string {
+func genRedisKeyUser(prefix, username, password string) string {
 	return prefix + username + strconv.Itoa(int(crc32.ChecksumIEEE([]byte(password))))
 }
 
 func GetUser(prefix string, username string, password string) (*model.User, error) {
-	Session := config.Redis.Get(getRediskey(prefix, username, password))
+	Session := config.Redis.Get(genRedisKeyUser(prefix, username, password))
 	if Session == nil {
 		return nil, errors.ERR_SESSION_NOT_EXIST
 	}
@@ -28,7 +29,7 @@ func GetUser(prefix string, username string, password string) (*model.User, erro
 	err := json.Unmarshal([]byte(Session.Val()), user)
 
 	if err != nil {
-		config.Redis.Del(getRediskey(prefix, username, password))
+		config.Redis.Del(genRedisKeyUser(prefix, username, password))
 		return nil, errors.ERR_JSON_DESER
 	}
 	return user, nil
@@ -37,12 +38,12 @@ func GetUser(prefix string, username string, password string) (*model.User, erro
 func SetUser(prefix string, username string, password string, sessionCookie *http.Cookie, routeCookie *http.Cookie) (*model.User, error) {
 	user := model.User{Username: username, Password: password, Session: *sessionCookie, Route: *routeCookie}
 	userJson, _ := json.Marshal(user)
-	config.Redis.Set(getRediskey(prefix, username, password), string(userJson), 5*time.Minute)
+	config.Redis.Set(genRedisKeyUser(prefix, username, password), string(userJson), 1*time.Second)
 	return &user, nil
 }
 
 func ForgetUser(prefix string, username string, password string) {
-	config.Redis.Del(getRediskey(prefix, username, password))
+	config.Redis.Del(genRedisKeyUser(prefix, username, password))
 }
 
 func ForgetAllUser(prefix string) {

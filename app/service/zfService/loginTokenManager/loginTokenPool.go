@@ -1,49 +1,56 @@
 package loginTokenManager
 
 import (
-	"container/list"
-	"sync"
+	"encoding/json"
+	"funnel/app/service"
+	"funnel/config"
+	"strconv"
 	"time"
+
+	"github.com/go-redis/redis"
 )
 
 type loginTokenPool struct {
-	mu sync.Mutex
-	l  list.List
 }
 
 // Get 从池中获取首个 LoginToken, 若池为空则返回 nil
 func (p *loginTokenPool) Get() *LoginToken {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if e := p.l.Front(); e != nil {
-		return p.l.Remove(e).(*LoginToken)
+	// 取出一个时间值(即分值)最小的元素
+	tk, err := config.Redis.ZPopMin(service.ZFLoginTkPrefix).Result()
+	if err != nil || len(tk) == 0 { // 空与错误判断
+		return nil
 	}
-	return nil
+	loginToken := &LoginToken{}
+	d, ok := tk[0].Member.(string) // 类型断言 如果此步出错应为设计问题
+	if !ok {
+		return nil
+	}
+	err = json.Unmarshal([]byte(d), loginToken) // 反序列化
+	if err != nil {
+		return nil
+	}
+	return loginToken
 }
 
 func (p *loginTokenPool) Add(v *LoginToken) {
-	p.mu.Lock()
-	p.l.PushBack(v)
-	p.mu.Unlock()
+	tokenJson, err := json.Marshal(v)
+	if err != nil {
+		return
+	}
+	config.Redis.ZAdd(service.ZFLoginTkPrefix,
+		redis.Z{
+			Score:  float64(v.RequestTime.UnixMicro()),
+			Member: tokenJson}) // 按照时间排序的有序集合
 }
 
-func (p *loginTokenPool) Size() int32 {
-	size := p.l.Len()
-	return int32(size)
+func (p *loginTokenPool) Size() int64 {
+	size, err := config.Redis.ZCard(service.ZFLoginTkPrefix).Result()
+	if err != nil {
+		return 0
+	}
+	return int64(size)
 }
 
 func (p *loginTokenPool) RemoveExpired(before time.Time) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	for {
-		if e := p.l.Front(); e != nil {
-			if e.Value.(*LoginToken).RequestTime.Before(before) {
-				p.l.Remove(e)
-			} else {
-				break // 遇到未过期 token 结束
-			}
-		} else {
-			break // 池为空结束
-		}
-	}
+	config.Redis.ZRemRangeByScore(service.ZFLoginTkPrefix, "0", strconv.FormatInt(before.UnixMicro(), 10))
 }

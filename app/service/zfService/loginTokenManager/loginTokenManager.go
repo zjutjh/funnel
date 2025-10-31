@@ -18,9 +18,9 @@ type LoginToken struct {
 
 type LoginTokenManager struct {
 	// CONFIGS
-	preferredTokenCount     int32  // 期望保持的 Token 数量
-	currentRunningResisters int32  // 当前正在运行的注册器数量
-	maxResisters            int32  // 最大注册器数量
+	preferredTokenCount     int64  // 期望保持的 Token 数量
+	currentRunningResisters int64  // 当前正在运行的注册器数量
+	maxResisters            int64  // 最大注册器数量
 	tokenExpirationTimeSec  int32  // Token 过期时间
 	routineMaintenanceSec   int32  // 两次例行池维护的间隔
 	activeMaintenanceEvery  int32  // n 次 get 请求触发一次池维护
@@ -39,11 +39,11 @@ func Init(host string) {
 func (m *LoginTokenManager) Init(host string) {
 	m.tokenPool = &loginTokenPool{}
 	m.hostUrl = host
-	m.preferredTokenCount = 50
+	m.preferredTokenCount = 10
 	m.maxResisters = 10
 	m.currentRunningResisters = 0
 	m.tokenExpirationTimeSec = 2 * 60 * 60
-	m.routineMaintenanceSec = 10
+	m.routineMaintenanceSec = 15
 	m.activeMaintenanceEvery = 5
 	m.getAfterLastActMt = 0
 
@@ -56,6 +56,7 @@ func (m *LoginTokenManager) GetAToken() (*LoginToken, error) {
 	if tk != nil && err == nil { //从池取 token 成功, 直接返回
 		return tk, nil
 	}
+	log.Println("WARN Cannot get token in pool")
 	ptk, err := RunRegister(m.hostUrl) // 开始尝试即时获取 token
 	if err == nil {
 		return &ptk, nil
@@ -99,10 +100,10 @@ func (m *LoginTokenManager) poolMaintenance() {
 	m.tokenPool.RemoveExpired(time.Now().Add(-time.Duration(m.tokenExpirationTimeSec) * time.Second)) // 移除过期 token
 	currentPoolSize := m.tokenPool.Size()                                                             // 获取当前池中 Token 数量
 	if currentPoolSize < m.preferredTokenCount {                                                      // 需要增加注册器的情况
-		var pfRegister int32
-		if currentPoolSize > int32(float32(m.preferredTokenCount)*0.25) { // 池填充 25% 以上
+		var pfRegister int64
+		if currentPoolSize > int64(float64(m.preferredTokenCount)*0.25) { // 池填充 25% 以上
 			// 启动部分注册器 根据池的当前大小动态调整
-			pfRegister = int32(float32(m.maxResisters) * (1 - float32(currentPoolSize)/float32(m.preferredTokenCount)))
+			pfRegister = int64(float32(m.maxResisters) * (1 - float32(currentPoolSize)/float32(m.preferredTokenCount)))
 			if pfRegister < 1 { // 最少启动一个注册器
 				pfRegister = 1
 			}
@@ -114,14 +115,14 @@ func (m *LoginTokenManager) poolMaintenance() {
 }
 
 // 调用注册器
-func (m *LoginTokenManager) callRegister(preferredCount int32) {
+func (m *LoginTokenManager) callRegister(preferredCount int64) {
 	// 限制最大同时启用的注册器数量
 	if m.currentRunningResisters+preferredCount > m.maxResisters {
 		preferredCount = m.maxResisters - m.currentRunningResisters
 	}
-	for i := int32(0); i < preferredCount; i++ {
+	for i := int64(0); i < preferredCount; i++ {
 		go func() {
-			atomic.AddInt32(&m.currentRunningResisters, 1) // 正在运行的注册器数量加一
+			atomic.AddInt64(&m.currentRunningResisters, 1) // 正在运行的注册器数量加一
 			log.Println("RUN REG NOW:", m.currentRunningResisters)
 			token, err := RunRegister(m.hostUrl)
 			if err == nil {
@@ -130,10 +131,10 @@ func (m *LoginTokenManager) callRegister(preferredCount int32) {
 			} // TODO: ERROR LOG NEEDED
 			log.Printf("REG FINISH: %v\n", err)
 			if m.tokenPool.Size() < m.preferredTokenCount &&
-				atomic.LoadInt32(&m.currentRunningResisters) < m.maxResisters {
+				atomic.LoadInt64(&m.currentRunningResisters) < m.maxResisters {
 				m.poolMaintenance() // 池不满且有注册器名额时 继续维护池
 			}
-			defer atomic.AddInt32(&m.currentRunningResisters, -1) // 正在运行的注册器数量减一
+			defer atomic.AddInt64(&m.currentRunningResisters, -1) // 正在运行的注册器数量减一
 		}()
 	}
 }
