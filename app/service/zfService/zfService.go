@@ -8,10 +8,11 @@ import (
 	"funnel/app/model"
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
-	"github.com/PuerkitoBio/goquery"
-	"io/ioutil"
+	"io"
 	"net/url"
 	"sort"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func GetLessonsTable(stu *model.User, year string, term string) (interface{}, error) {
@@ -124,7 +125,7 @@ func GetTrainingPrograms(stu *model.User) ([]byte, error) {
 	s, exist := doc.Find("#pyfaxx_id").Attr("value")
 	if exist {
 		res, _ := f.GetRaw(zf.ZfPY() + s)
-		s, _ := ioutil.ReadAll(res.Body)
+		s, _ := io.ReadAll(res.Body)
 		return s, nil
 	}
 	return nil, nil

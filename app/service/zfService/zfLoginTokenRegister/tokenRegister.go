@@ -83,7 +83,7 @@ func (r *ZFLoginTokenRegister) SolveAndSubmit(captchaSolution string) (bool, err
 		return false, err
 	}
 	if !isPassed {
-		return false, fmt.Errorf("captcha not passed") // TODO RETRY
+		return false, fmt.Errorf("captcha not passed")
 	}
 	// 获取密码加密密钥
 	if err := r.getCryptoKey(); err != nil {
@@ -224,7 +224,7 @@ func (r *ZFLoginTokenRegister) getCryptoKey() error {
 		Get(r.hostUrl + "/jwglxt/xtgl/login_getPublicKey.html")
 
 	if err != nil || resp.IsError() {
-		return fmt.Errorf("cannot get crypto keys: %w", err) // ERR_HANDLE_4
+		return fmt.Errorf("cannot get crypto keys: %w", err)
 	}
 	r.CryptoModulus = payload.Modulus
 	r.CryptoExponent = payload.Exponent

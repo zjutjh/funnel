@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"funnel/app/apis/oauth"
 	"funnel/app/utils/fetch"
 	"funnel/app/utils/security"
@@ -38,29 +39,28 @@ func genTermRelatedInfoReqData(year string, term string) url.Values {
 		"xsdm":                 {}}
 }
 
+// 根据提供的 modulus 和 exponent 加密 password
 func encryptPassword(password, modulus, exponent string) (string, error) {
-	nString, _ := base64.StdEncoding.DecodeString(modulus)
+	// 转换 modulus 到 bigInt 类型
+	nString, err := base64.StdEncoding.DecodeString(modulus)
+	if err != nil {
+		return "", fmt.Errorf("modulus not a valid base64-string: %w", err)
+	}
 	n, _ := new(big.Int).SetString(hex.EncodeToString(nString), 16)
-	eString, _ := base64.StdEncoding.DecodeString(exponent)
-	e, _ := strconv.ParseInt(hex.EncodeToString(eString), 16, 32)
+	// 转换 exponent 到 Int 类型
+	eString, err := base64.StdEncoding.DecodeString(exponent)
+	if err != nil {
+		return "", fmt.Errorf("exponent not a valid base64-string: %w", err)
+	}
+	e, err := strconv.ParseInt(hex.EncodeToString(eString), 16, 32)
+	if err != nil {
+		return "", fmt.Errorf("exponent not a valid num: %w", err)
+	}
+	// 构建并执行加密
 	pub := rsa.PublicKey{E: int(e), N: n}
 	cc, err := rsa.EncryptPKCS1v15(rand.Reader, &pub, []byte(password))
 	return base64.StdEncoding.EncodeToString(cc), err
 }
-
-// func genLoginData(username, encryptedPwd string) url.Values {
-// 	return url.Values{
-// 		"yhm": {username},
-// 		"mm":  {encryptedPwd}}
-// }
-
-// func genLoginData(username, password string, f fetch.Fetch) url.Values {
-// 	s, _ := f.Get(zf.ZfLoginGetPublickey())
-// 	encodePassword, _ := security.GetEncodePassword(s, []byte(password))
-// 	return url.Values{
-// 		"yhm": {username},
-// 		"mm":  {encodePassword}}
-// }
 
 func genOauthLoginData(username, password, execution string, f *fetch.Fetch) url.Values {
 	s, _ := f.Get(oauth.OauthLoginGetPublickey())

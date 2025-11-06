@@ -5,10 +5,11 @@ import (
 	"funnel/app/apis/library"
 	"funnel/app/errors"
 	"funnel/app/service/libraryService/request"
-	"github.com/PuerkitoBio/goquery"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 // OAuthLogin 统一登陆
@@ -42,6 +43,9 @@ func OAuthLogin(username string, password string) ([]*http.Cookie, error) {
 
 	// 密码加密
 	encPwd, err := GetEncryptedPwd(client, password)
+	if err != nil {
+		return nil, err
+	}
 
 	loginParams := map[string]string{
 		"username":   username,
@@ -64,7 +68,7 @@ func OAuthLogin(username string, password string) ([]*http.Cookie, error) {
 	// resty只能自动处理header.Location中的重定向
 	redirect := GetRedirectLocation(resp.String())
 
-	resp, err = client.Request().
+	_, err = client.Request().
 		Get(redirect)
 	if err != nil {
 		return nil, err

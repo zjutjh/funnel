@@ -121,7 +121,7 @@ func findGapLeftEdge(bgImg, templateImg image.Image) (int, error) {
 	// 图像大小校验
 	imgBounds := bgImg.Bounds()
 	if imgBounds.Dx() != templateImg.Bounds().Dx() || imgBounds.Dy() != templateImg.Bounds().Dy() {
-		return 0, fmt.Errorf("背景图和模板图尺寸不匹配") // ERR_HANDLE_7
+		return 0, fmt.Errorf("bgImg(downloaded) and templateImg size mismatch")
 	}
 
 	maxStartY := imgBounds.Dy() - 1 // 可能作为指纹的右侧不检测
@@ -152,7 +152,7 @@ func findGapLeftEdge(bgImg, templateImg image.Image) (int, error) {
 			}
 		}
 	}
-	return 0, fmt.Errorf("未找到目标位置") // ERR_HANDLE_8
+	return 0, fmt.Errorf("targeted left edge not found")
 }
 
 func (c *CompareCracker) genMouseTrack(distance int) string {

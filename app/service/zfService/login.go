@@ -17,23 +17,18 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-type captchaServerResponse struct {
-	Status int    `json:"status"`
-	Data   string `json:"msg"`
-}
-
 func login(username string, password string) (*model.User, error) {
-	ltk, err := loginTokenManager.LoginTkMgr.GetAToken()
+	loginToken, err := loginTokenManager.LoginTokenMgr.ObtainToken()
 	if err != nil {
 		return nil, err
 	}
-	session, err := submitLogin(username, password, *ltk)
+	session, err := submitLogin(username, password, *loginToken)
 	if err != nil {
 		return nil, err
 	}
 	return service.SetUser(service.ZFPrefix, username, password,
 		&http.Cookie{Name: "JSESSIONID", Value: session},
-		&http.Cookie{Name: "route", Value: ltk.Route})
+		&http.Cookie{Name: "route", Value: loginToken.Route})
 }
 
 func submitLogin(username, password string, loginToken loginTokenManager.LoginToken) (string, error) {
@@ -97,65 +92,6 @@ func submitLogin(username, password string, loginToken loginTokenManager.LoginTo
 
 	return sessionCookie, nil
 }
-
-// func login(username string, password string) (*model.User, error) {
-// 	f := fetch.Fetch{}
-// 	f.Init()
-// 	_, err := f.Get(zf.ZfLoginHome())
-// 	//if strings.Contains(err.Error(), "context deadline exceeded") {
-// 	//	if strings.Compare(config.Redis.Get("zf_url").String(), "new") == 0 {
-// 	//		config.Redis.Set("zf_url", "bk", 0)
-// 	//	} else {
-// 	//		config.Redis.Set("zf_url", "new", 0)
-// 	//	}
-// 	//}
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if len(f.Cookie) < 2 {
-// 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
-// 	}
-// 	var URL string
-// 	if strings.Compare(config.Redis.Get("zf_url").String(), "new") == 0 {
-// 		URL = apis.CAPTCHA_NEW_BREAKER_URL
-// 	} else {
-// 		URL = apis.CAPTCHA_BREAKER_URL
-// 	}
-// 	captcha, err := f.Get(URL + "?session=" + f.Cookie[0].Value + "&route=" + f.Cookie[1].Value)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	captchaRes := &captchaServerResponse{}
-// 	_ = json.Unmarshal(captcha, captchaRes)
-// 	if captchaRes.Status != 0 {
-// 		return nil, errors.ERR_WRONG_Captcha
-// 	}
-// 	loginData := genLoginData(username, password, f)
-// 	s, err := f.PostForm(zf.ZfLoginHome(), loginData)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if strings.Contains(string(s), "请先滑动图片进行验证") {
-// 		return nil, errors.ERR_WRONG_Captcha
-// 	}
-// 	if strings.Contains(string(s), "用户名或密码不正确") {
-// 		return nil, errors.ERR_WRONG_PASSWORD
-// 	}
-// 	var sessionCookie *http.Cookie
-// 	var routeCookie *http.Cookie
-// 	for _, v := range f.Cookie {
-// 		if v.Name == "JSESSIONID" {
-// 			sessionCookie = v
-// 		}
-// 		if v.Name == "route" {
-// 			routeCookie = v
-// 		}
-// 	}
-// 	if sessionCookie == nil {
-// 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
-// 	}
-// 	return service.SetUser(service.ZFPrefix, username, password, sessionCookie, routeCookie)
-// }
 
 func loginByOauth(username string, password string) (*model.User, error) {
 	f := fetch.Fetch{}
