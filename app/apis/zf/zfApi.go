@@ -35,7 +35,7 @@ func ZfClassTable() string {
 	return ChooseURL() + "kbcx/xskbcx_cxXsgrkb.html?gnmkdm=N2151&su="
 }
 func ZfScore() string {
-	return ChooseURL() + "cjcx/cjcx_cxDgXscj.html?doType=query"
+	return ChooseURL() + "cjcx/cjcx_cxDgXscj.html?doType=query&gnmkdm=N305005"
 }
 func ZfScoreDetail() string {
 	return ChooseURL() + "cjcx/cjcx_cxXsKccjList.html?doType=query"
