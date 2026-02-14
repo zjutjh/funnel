@@ -1,0 +1,33 @@
+local.file_match "local_files" {
+    path_targets = [
+		{__path__ = "/logs/*.log", __path_exclude__ = "/logs/*error*.log"},
+	]
+    sync_period  = "5s"
+}
+
+loki.source.file "log_scrape" {
+    targets    = local.file_match.local_files.targets
+    forward_to = [loki.process.json_transform.receiver]
+}
+
+loki.process "json_transform" {
+	stage.json {
+		expressions = {
+			"app" = "",
+		}
+    }
+
+	stage.labels {
+		values = {
+			"app" = "",
+		}
+    }
+
+	forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+	}
+}
