@@ -8,7 +8,7 @@ import (
 	"github.com/zjutjh/mygo/foundation/crontab"
 	"github.com/zjutjh/mygo/foundation/httpserver"
 
-	"app/register"
+	"funnel/register"
 )
 
 func main() {

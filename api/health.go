@@ -11,7 +11,7 @@ import (
 	"github.com/zjutjh/mygo/nlog"
 	"github.com/zjutjh/mygo/swagger"
 
-	"app/comm"
+	"funnel/comm"
 )
 
 // HealthHandler Api router注册点

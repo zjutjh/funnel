@@ -8,7 +8,7 @@ import (
 	"github.com/zjutjh/mygo/middleware/cors"
 	"github.com/zjutjh/mygo/swagger"
 
-	"app/api"
+	"funnel/api"
 )
 
 func Route(router *gin.Engine) {

@@ -7,8 +7,8 @@ import (
 	"github.com/zjutjh/mygo/ndb"
 	"gorm.io/gorm"
 
-	"app/dao/model"
-	"app/dao/query"
+	"funnel/dao/model"
+	"funnel/dao/query"
 )
 
 type UserRepo struct {

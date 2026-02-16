@@ -8,7 +8,7 @@ import (
 	"gorm.io/gen/field"
 	"gorm.io/gorm"
 
-	"app/register"
+	"funnel/register"
 )
 
 var tables = []string{
