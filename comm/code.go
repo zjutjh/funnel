@@ -27,4 +27,9 @@ var (
 )
 
 // 业务错误码 从 30000 开始
-var ()
+var (
+	CodeWrongUsernameOrPassword = kit.NewCode(30000, "用户名或密码错误")
+	CodeOauthClosed             = kit.NewCode(30001, "统一系统在夜间关闭")
+	CodeOauthPasswordNeedEdit   = kit.NewCode(30002, "统一密码需要修改, 请手动登录统一修改")
+	CodeOauthNotActivated       = kit.NewCode(30003, "统一账号未激活")
+)

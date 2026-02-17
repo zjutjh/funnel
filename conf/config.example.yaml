@@ -14,8 +14,10 @@ http_server:
 # 业务私有配置
 biz:
   zf:
-    timeout: "5s"
-    base_url: "www.gdjw.zjut.edu.cn/jwglxt/"
+    public:
+      username: "mjj"
+      password: "114514"
+    base_url: "http://www.gdjw.zjut.edu.cn/jwglxt/"
 
 # 应用业务日志配置
 log:
