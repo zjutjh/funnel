@@ -3,9 +3,11 @@ package zfClient
 import (
 	"funnel/comm"
 	"funnel/register"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zjutjh/mygo/foundation/kernel"
 )
 
@@ -15,11 +17,23 @@ func TestMain(m *testing.M) {
 }
 
 func TestBypassCaptcha(t *testing.T) {
-	result, err := New(t.Context()).BypassCaptcha()
-	if err != nil {
-		t.Fatalf("验证失败: %v", err)
+	sem := make(chan struct{}, 10)
+	var wg sync.WaitGroup
+
+	for range 100 {
+		sem <- struct{}{}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			defer func() { <-sem }()
+			result, err := New(t.Context()).BypassCaptcha()
+			require.NoError(t, err)
+			require.NotNil(t, result)
+			assert.NotEmpty(t, result.JSessionID)
+			assert.NotEmpty(t, result.Route)
+		}()
 	}
-	t.Logf("验证成功: %s", result)
+	wg.Wait()
 }
 
 func TestLoginByCaptcha(t *testing.T) {

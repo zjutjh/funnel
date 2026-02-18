@@ -1,7 +1,5 @@
 package zfClient
 
-// TODO  SessionPool
-
 import (
 	"bytes"
 	"context"
@@ -36,6 +34,7 @@ func New(ctx context.Context) *ZFClient {
 		httpClient.
 			SetBaseURL(comm.BizConf.ZF.BaseURL).
 			SetRedirectPolicy(resty.NoRedirectPolicy())
+		httpClient.SetCookieJar(nil)
 	})
 	return &ZFClient{
 		Logger: nlog.Pick().WithContext(ctx).Logger,
