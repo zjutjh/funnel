@@ -1,11 +1,18 @@
 package zfClient
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 // ZFCookie 维护正方Cookie参数
 type ZFCookie struct {
 	JSessionID string
 	Route      string
+}
+
+func (z *ZFCookie) String() string {
+	return fmt.Sprintf("JSessionID=%s; route=%s", z.JSessionID, z.Route)
 }
 
 func (z *ZFCookie) ToCookie() []*http.Cookie {

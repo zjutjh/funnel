@@ -7,9 +7,9 @@ app:
 http_server:
   addr: ":8888"
   log:
-    # 仅在本地开发调试时打开
-    # access_filename: "/dev/stdout"
-    # error_filename: "/dev/stderr"
+  # 仅在本地开发调试时打开
+  # access_filename: "/dev/stdout"
+  # error_filename: "/dev/stderr"
 
 # 业务私有配置
 biz:
@@ -18,6 +18,10 @@ biz:
       username: "mjj"
       password: "114514"
     base_url: "http://www.gdjw.zjut.edu.cn/jwglxt/"
+    session_pool:
+      max_size: 64         # 池容量
+      ttl_minute: 30       # cookie 过期时间
+      fill_workers: 3      # 并发填充数
 
 # 应用业务日志配置
 log:
@@ -32,13 +36,13 @@ resty:
 # 跨域中间件配置
 mid_cors:
   allow_origins: [
-      # 本地/测试等环境配置 正式环境须去除
-      "*",
-      "https://test.*.com",
+    # 本地/测试等环境配置 正式环境须去除
+    "*",
+    "https://test.*.com",
 
-      # 生产环境配置
-      "https://prod.*.com",
-    ]
+    # 生产环境配置
+    "https://prod.*.com",
+  ]
 
 # 数据库配置
 db:

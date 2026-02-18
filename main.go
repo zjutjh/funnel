@@ -1,6 +1,7 @@
 package main
 
 import (
+	"funnel/sessionpool"
 	"sync"
 
 	"github.com/spf13/cobra"
@@ -34,7 +35,9 @@ func main() {
 			}()
 
 			// 如有需要 可以额外启动其他服务
-
+			// sessionpool
+			wg.Add(1)
+			sessionpool.New().Run()
 			wg.Wait()
 			return nil
 		},
