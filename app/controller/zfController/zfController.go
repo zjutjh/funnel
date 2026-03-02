@@ -7,27 +7,9 @@ import (
 	"funnel/app/model"
 	"funnel/app/service/zfService"
 	"funnel/app/utils"
+
 	"github.com/gin-gonic/gin"
 )
-
-// GetScoreDetail
-//
-//		@Summary 正方教务详细成绩
-//		@Description 正方教务详细成绩
-//		@Tags 正方
-//		@Produce  json
-//		@Param term body string true "学期"
-//		@Param year body string true "年份"
-//		@Param username body string true "用户名"
-//		@Param password body string true "密码"
-//	    @Param type body string true "登录类型"
-//		@Success 200 json  {"code":200,"data":{object},"msg":"OK"}
-//		@Failure 400 json  {"code":400,"data":null,"msg":""}
-//		@Router /student/zfService/score/info [post]
-func GetScoreDetail(context *gin.Context) {
-	_, _ = ZFTermInfoHandle(context, zfService.GetScoreDetail)
-	return
-}
 
 // GetScore
 //

@@ -8,10 +8,11 @@ import (
 	"funnel/app/model"
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
-	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"net/url"
 	"sort"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func GetLessonsTable(stu *model.User, year string, term string) (interface{}, error) {
@@ -39,15 +40,7 @@ func GetExamInfo(stu *model.User, year string, term string) (interface{}, error)
 	})
 	return result, nil
 }
-func GetScoreDetail(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfScoreDetail(), year, term, -1)
-	if err != nil {
-		return nil, err
-	}
-	var f model.ScoreDetailRawInfo
-	err = json.Unmarshal([]byte(res), &f)
-	return model.TransformScoreDetailInfo(&f), err
-}
+
 func GetScore(stu *model.User, year string, term string) (interface{}, error) {
 	res, err := fetchTermRelatedInfo(stu, zf.ZfScore(), year, term, -1)
 	if err != nil {

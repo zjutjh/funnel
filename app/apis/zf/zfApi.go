@@ -43,6 +43,11 @@ func ZfScoreDetail() string {
 func ZfMinTermScore() string {
 	return ChooseURL() + "design/funcData_cxFuncDataList.html?func_widget_guid=5EF567BFD3CE243EE053A11310AC1252&gnmkdm=N305013"
 }
+
+func ZfCaptchaURL() string {
+	return ChooseURL() + "zfcaptchaLogin?instanceId=zfcaptchaLogin"
+}
+
 func ZfEmptyClassRoom() string {
 	return ChooseURL() + "cdjy/cdjy_cxKxcdlb.html?doType=query"
 }
