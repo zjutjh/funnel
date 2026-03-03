@@ -138,7 +138,7 @@ func bypassCaptcha() ([]*http.Cookie, error) {
 		return nil, err
 	}
 	slog.Info("验证码验证结果:", "result", response.String())
-	return cookies, err
+	return cookies, nil
 }
 
 // login 验证码登录正方
