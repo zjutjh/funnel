@@ -9,9 +9,6 @@ redis:
 
 library:
 
-captcha:
-  breaker_url:
-  new_breaker_url:
 
 zf:
   url:

@@ -1,24 +1,5 @@
 package model
 
-func TransformScoreDetailInfo(raw *ScoreDetailRawInfo) ScoreDetailInfo {
-	var scoreInfo ScoreDetailInfo
-	for _, value := range raw.Items {
-		scoreInfo = append(scoreInfo,
-			&ScoreDetail{
-				Score: value.Xmcj,
-
-				LessonName: value.Kcmc,
-				LessonID:   value.Kch,
-				ClassName:  value.Jxbmc,
-				Credits:    value.Xf,
-
-				Name: value.Xmblmc,
-			})
-	}
-
-	return scoreInfo
-}
-
 type ScoreDetail struct {
 	Name       string `json:"name"`
 	Score      string `json:"score"`

@@ -8,11 +8,8 @@ import (
 	"funnel/app/model"
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
-	"io/ioutil"
 	"net/url"
 	"sort"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 func GetLessonsTable(stu *model.User, year string, term string) (interface{}, error) {
@@ -98,31 +95,6 @@ func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string, examIn
 	}
 	return string(s), nil
 }
-
-func GetTrainingPrograms(stu *model.User) ([]byte, error) {
-	f := fetch.Fetch{}
-	f.Init()
-	f.Cookie = append(f.Cookie, &stu.Session)
-	f.Cookie = append(f.Cookie, &stu.Route)
-	response, err := f.GetRaw(zf.ZfUserInfo())
-
-	if err != nil {
-		return nil, err
-	}
-	doc, err := goquery.NewDocumentFromReader(response.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	s, exist := doc.Find("#pyfaxx_id").Attr("value")
-	if exist {
-		res, _ := f.GetRaw(zf.ZfPY() + s)
-		s, _ := ioutil.ReadAll(res.Body)
-		return s, nil
-	}
-	return nil, nil
-}
-
 func GetEmptyRoomInfo(stu *model.User, year string, term string, campus string, weekday string, week string, classPeriod string) (string, error) {
 	f := fetch.Fetch{}
 	f.Init()

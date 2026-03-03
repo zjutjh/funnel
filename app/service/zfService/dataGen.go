@@ -2,7 +2,6 @@ package zfService
 
 import (
 	"funnel/app/apis/oauth"
-	"funnel/app/apis/zf"
 	"funnel/app/utils/fetch"
 	"funnel/app/utils/security"
 	"net/url"
@@ -31,14 +30,6 @@ func genTermRelatedInfoReqData(year string, term string) url.Values {
 		"kzlx":                 {"ck"},
 		"queryModel.showCount": {"100"},
 		"xsdm":                 {}}
-}
-
-func genLoginData(username, password string, f fetch.Fetch) url.Values {
-	s, _ := f.Get(zf.ZfLoginGetPublickey())
-	encodePassword, _ := security.GetEncodePassword(s, []byte(password))
-	return url.Values{
-		"yhm": {username},
-		"mm":  {encodePassword}}
 }
 
 func genOauthLoginData(username, password, execution string, f *fetch.Fetch) url.Values {

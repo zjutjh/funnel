@@ -87,44 +87,6 @@ func GetClassTable(context *gin.Context) {
 	return
 }
 
-// GetProgInfo
-//
-//		@Summary 正方教务考试信息
-//		@Description 正方教务考试信息
-//		@Tags 正方
-//		@Produce  json
-//		@Param username body string true "用户名"
-//		@Param password body string true "密码"
-//	    @Param type body string true "登录类型"
-//		@Success 200 json  {"code":200,"data":{object},"msg":"OK"}
-//		@Failure 400 json  {"code":400,"data":null,"msg":""}
-//		@Router /student/zfService/program [post]
-func GetProgInfo(context *gin.Context) {
-
-	user, err := controller.LoginHandle(context, zfService.GetUser, false)
-	if err != nil {
-		controller.ErrorHandle(context, err)
-		return
-	}
-	result, err := zfService.GetTrainingPrograms(user)
-	if err == errors.ERR_SESSION_EXPIRES {
-		user, err = controller.LoginHandle(context, zfService.GetUser, false)
-		if err != nil {
-			controller.ErrorHandle(context, err)
-			return
-		}
-		result, err = zfService.GetTrainingPrograms(user)
-	}
-
-	if err != nil {
-		controller.ErrorHandle(context, err)
-		return
-	}
-
-	context.Data(200, "application/pdf", result)
-	return
-}
-
 // GetRoomInfo
 //
 //		@Summary 正方教务考试信息
