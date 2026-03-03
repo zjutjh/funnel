@@ -33,23 +33,23 @@ func loadTemplates() {
 		templates = make(map[string]image.Image)
 		entries, err := templateFS.ReadDir("static")
 		if err != nil {
-			slog.Error("验证码初始化失败, 无法读取嵌入目录: %v", err)
+			slog.Error("验证码初始化失败, 无法读取嵌入目录", "err", err)
 			panic(err)
 		}
 		for _, entry := range entries {
 			name := entry.Name()
 			if !strings.EqualFold(filepath.Ext(entry.Name()), ".png") {
-				slog.Warn("跳过非PNG文件: %s", name)
+				slog.Warn("跳过非PNG文件", "name", name)
 				continue
 			}
 			data, err := templateFS.ReadFile("static/" + name)
 			if err != nil {
-				slog.Error("无法读取嵌入文件 %s: %v", name, err)
+				slog.Error("无法读取嵌入文件", "name", name, "error", err)
 				continue
 			}
 			img, _, err := image.Decode(bytes.NewReader(data))
 			if err != nil {
-				slog.Error("无法解码嵌入图像 %s: %v", name, err)
+				slog.Error("无法解码嵌入图像", "name", name, "error", err)
 				continue
 			}
 			templates[generateFingerprint(img)] = img
