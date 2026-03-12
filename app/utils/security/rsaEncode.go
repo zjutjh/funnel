@@ -16,22 +16,6 @@ type RSAPublicKey struct {
 	Exponent string `json:"exponent"`
 }
 
-func GetEncodePassword(publickey []byte, password []byte) (string, error) {
-	K := &RSAPublicKey{}
-	err := json.Unmarshal(publickey, K)
-	if err != nil {
-		return "", err
-	}
-
-	nString, _ := base64.StdEncoding.DecodeString(K.Modulus)
-	n, _ := new(big.Int).SetString(hex.EncodeToString(nString), 16)
-	eString, _ := base64.StdEncoding.DecodeString(K.Exponent)
-	e, _ := strconv.ParseInt(hex.EncodeToString(eString), 16, 32)
-	pub := rsa.PublicKey{E: int(e), N: n}
-	cc, err := rsa.EncryptPKCS1v15(rand.Reader, &pub, password)
-	return base64.StdEncoding.EncodeToString(cc), err
-}
-
 func GetEncryptPassword(publicKey []byte, password string) (string, error) {
 	K := &RSAPublicKey{}
 	err := json.Unmarshal(publicKey, K)
@@ -45,6 +29,33 @@ func GetEncryptPassword(publicKey []byte, password string) (string, error) {
 
 	encode := encryptString(password, pub)
 	return encode, err
+}
+
+// RSAEncryptWithPublicKey 使用模数和指数加密数据
+func RSAEncryptWithPublicKey(plaintext, modulusB64, exponentB64 string) (string, error) {
+	if plaintext == "" || modulusB64 == "" || exponentB64 == "" {
+		return "", fmt.Errorf("plaintext, modulusB64 and exponentB64 cannot be empty")
+	}
+	// base64 decode
+	modulusBytes, err := base64.StdEncoding.DecodeString(modulusB64)
+	if err != nil {
+		return "", fmt.Errorf("modulus base64 解码失败: %v", err)
+	}
+	exponentBytes, err := base64.StdEncoding.DecodeString(exponentB64)
+	if err != nil {
+		return "", fmt.Errorf("exponent base64 解码失败: %v", err)
+	}
+	// 构造 RSA 公钥
+	pubKey := &rsa.PublicKey{
+		N: new(big.Int).SetBytes(modulusBytes),
+		E: int(new(big.Int).SetBytes(exponentBytes).Int64()),
+	}
+	// 加密
+	encrypted, err := rsa.EncryptPKCS1v15(rand.Reader, pubKey, []byte(plaintext))
+	if err != nil {
+		return "", fmt.Errorf("rsa.EncryptPKCS1v15 加密失败: %v", err)
+	}
+	return base64.StdEncoding.EncodeToString(encrypted), nil
 }
 
 func publicKeyFromHex(modulusHexString string, exponent int) *rsa.PublicKey {

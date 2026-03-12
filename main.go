@@ -3,6 +3,7 @@ package main
 import (
 	"funnel/config/config"
 	"funnel/router"
+
 	"github.com/gin-gonic/gin"
 )
 

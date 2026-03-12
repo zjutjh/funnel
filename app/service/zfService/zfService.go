@@ -8,8 +8,6 @@ import (
 	"funnel/app/model"
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
-	"github.com/PuerkitoBio/goquery"
-	"io/ioutil"
 	"net/url"
 	"sort"
 )
@@ -39,15 +37,7 @@ func GetExamInfo(stu *model.User, year string, term string) (interface{}, error)
 	})
 	return result, nil
 }
-func GetScoreDetail(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfScoreDetail(), year, term, -1)
-	if err != nil {
-		return nil, err
-	}
-	var f model.ScoreDetailRawInfo
-	err = json.Unmarshal([]byte(res), &f)
-	return model.TransformScoreDetailInfo(&f), err
-}
+
 func GetScore(stu *model.User, year string, term string) (interface{}, error) {
 	res, err := fetchTermRelatedInfo(stu, zf.ZfScore(), year, term, -1)
 	if err != nil {
@@ -105,31 +95,6 @@ func fetchTermRelatedInfo(stu *model.User, requestUrl, year, term string, examIn
 	}
 	return string(s), nil
 }
-
-func GetTrainingPrograms(stu *model.User) ([]byte, error) {
-	f := fetch.Fetch{}
-	f.Init()
-	f.Cookie = append(f.Cookie, &stu.Session)
-	f.Cookie = append(f.Cookie, &stu.Route)
-	response, err := f.GetRaw(zf.ZfUserInfo())
-
-	if err != nil {
-		return nil, err
-	}
-	doc, err := goquery.NewDocumentFromReader(response.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	s, exist := doc.Find("#pyfaxx_id").Attr("value")
-	if exist {
-		res, _ := f.GetRaw(zf.ZfPY() + s)
-		s, _ := ioutil.ReadAll(res.Body)
-		return s, nil
-	}
-	return nil, nil
-}
-
 func GetEmptyRoomInfo(stu *model.User, year string, term string, campus string, weekday string, week string, classPeriod string) (string, error) {
 	f := fetch.Fetch{}
 	f.Init()

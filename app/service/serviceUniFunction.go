@@ -41,17 +41,6 @@ func SetUser(prefix string, username string, password string, sessionCookie *htt
 	return &user, nil
 }
 
-func ForgetUser(prefix string, username string, password string) {
-	config.Redis.Del(getRediskey(prefix, username, password))
-}
-
-func ForgetAllUser(prefix string) {
-	res, _ := config.Redis.Keys(prefix + "*").Result()
-	for _, v := range res {
-		config.Redis.Del(v)
-	}
-}
-
 func ForgetUserByUsername(prefix, username string) {
 	res, _ := config.Redis.Keys(prefix + username + "*").Result()
 	for _, v := range res {
