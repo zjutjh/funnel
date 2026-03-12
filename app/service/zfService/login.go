@@ -252,8 +252,8 @@ func loginByOauth(username string, password string) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	var sessionCookie *http.Cookie
-	var routeCookie *http.Cookie
+	sessionCookie := &http.Cookie{}
+	routeCookie := &http.Cookie{}
 	for _, v := range f.Cookie {
 		if v.Name == "JSESSIONID" {
 			sessionCookie = v
