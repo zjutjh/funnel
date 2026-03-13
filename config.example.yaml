@@ -11,6 +11,11 @@ library:
 
 
 zf:
+  # default 是开关可以用于切换默认配置, main/jf/... 不应在上线后修改
   url:
-  main_url:
-  bk_url:
+    # default 登录默认走的url, 直接正方验证码登录时走的url
+    default: "http://www.gdjw.zjut.edu.cn/jwglxt/"
+    # main 正方教务系统主站
+    main: "http://www.gdjw.zjut.edu.cn/jwglxt/"
+    # jf 正方教务系统缴费
+    jf: "http://www.gdjwjf.zjut.edu.cn/jwglxt/"

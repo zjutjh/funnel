@@ -60,13 +60,14 @@ func extractJsonStr(jsonStr, jsonKey string) string {
 // 4. 验证验证码结果，成功则返回cookie，失败则返回错误
 func bypassCaptcha() ([]*http.Cookie, error) {
 	client := resty.New().SetCookieJar(nil)
+	zfUrlFlag := zf.ZFURLDefaultFlag
 	// 初始化登录
 	response, err := client.R().
 		SetQueryParams(map[string]string{
 			"type": "resource",
 			"name": "zfdun_captcha.js",
 		}).
-		Get(zf.ZfCaptchaURL())
+		Get(zf.ZfCaptchaURL(zfUrlFlag))
 	if err != nil {
 		slog.Error("正方验证码登陆初始化失败", "err", err)
 		return nil, err
@@ -86,7 +87,7 @@ func bypassCaptcha() ([]*http.Cookie, error) {
 		SetCookies(cookies).
 		SetQueryParam("type", "refresh").
 		SetResult(&captchaData).
-		Get(zf.ZfCaptchaURL())
+		Get(zf.ZfCaptchaURL(zfUrlFlag))
 	if err != nil {
 		slog.Error("正方获取验证码失败", "err", err)
 		return nil, err
@@ -100,7 +101,7 @@ func bypassCaptcha() ([]*http.Cookie, error) {
 			"id":   captchaData.Si,
 			"imtk": captchaData.Imtk,
 		}).
-		Get(zf.ZfCaptchaURL())
+		Get(zf.ZfCaptchaURL(zfUrlFlag))
 	if err != nil {
 		slog.Error("正方下载验证码图片失败", "err", err)
 		return nil, err
@@ -126,7 +127,7 @@ func bypassCaptcha() ([]*http.Cookie, error) {
 			"rtk":    rtk,
 			"mt":     base64.StdEncoding.EncodeToString([]byte(result)),
 			"extend": "eyJhcHBOYW1lIjoiTmV0c2NhcGUiLCJ1c2VyQWdlbnQiOiJNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvMTQ0LjAuMC4wIFNhZmFyaS81MzcuMzYiLCJhcHBWZXJzaW9uIjoiNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS8xNDQuMC4wLjAgU2FmYXJpLzUzNy4zNiJ9",
-		}).Post(zf.ZfCaptchaURL())
+		}).Post(zf.ZfCaptchaURL(zfUrlFlag))
 	if err != nil {
 		slog.Error("正方验证码验证失败", "err", err)
 		return nil, err
@@ -146,6 +147,7 @@ func bypassCaptcha() ([]*http.Cookie, error) {
 // 2. 加密密码
 // 3. 提交登录请求，成功则返回用户信息，失败则返回错误
 func login(username, password string) (*model.User, error) {
+	zfUrlFlag := zf.ZFURLDefaultFlag
 	cookies, err := bypassCaptcha()
 	if err != nil {
 		return nil, err
@@ -158,7 +160,7 @@ func login(username, password string) (*model.User, error) {
 	var publicKey LoginPublicKeyResponse
 	_, err = client.R().SetCookies(cookies).
 		SetResult(&publicKey).
-		Get(zf.ZfLoginGetPublickey())
+		Get(zf.ZfLoginGetPublickey(zfUrlFlag))
 	if err != nil {
 		slog.Error("正方获取登录公钥失败", "err", err)
 		return nil, err
@@ -176,7 +178,7 @@ func login(username, password string) (*model.User, error) {
 			"yhm": username,
 			"mm":  encryptedPassword,
 		}).
-		Post(zf.ZfLoginHome())
+		Post(zf.ZfLoginHome(zfUrlFlag))
 	if err != nil && !stderrors.Is(err, resty.ErrAutoRedirectDisabled) {
 		return nil, err
 	}
@@ -192,8 +194,8 @@ func login(username, password string) (*model.User, error) {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
 	// 提取cookie
-	var sessionCookie *http.Cookie
-	var routeCookie *http.Cookie
+	sessionCookie := &http.Cookie{}
+	routeCookie := &http.Cookie{}
 	for _, cookie := range response.Cookies() {
 		if cookie.Name == "JSESSIONID" {
 			sessionCookie = cookie
@@ -205,10 +207,10 @@ func login(username, password string) (*model.User, error) {
 			routeCookie = cookie
 		}
 	}
-	if sessionCookie == nil || routeCookie == nil {
+	if sessionCookie == nil {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
-	return service.SetUser(service.ZFPrefix, username, password, sessionCookie, routeCookie)
+	return service.SetUser(service.ZFPrefix, username, password, sessionCookie, routeCookie, zf.UrlToFLag(zf.ChooseURL(zfUrlFlag)))
 }
 
 func loginByOauth(username string, password string) (*model.User, error) {
@@ -265,5 +267,5 @@ func loginByOauth(username string, password string) (*model.User, error) {
 	if sessionCookie == nil {
 		return nil, errors.ERR_UNKNOWN_LOGIN_ERROR
 	}
-	return service.SetUser(service.ZFPrefix, username, password, sessionCookie, routeCookie)
+	return service.SetUser(service.ZFPrefix, username, password, sessionCookie, routeCookie, zf.UrlToFLag(getRedirectUrl4.String()))
 }
