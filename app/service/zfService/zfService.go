@@ -13,7 +13,7 @@ import (
 )
 
 func GetLessonsTable(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfClassTable()+stu.Username, year, term, -1)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfClassTable(stu.ZfUrlFLag)+stu.Username, year, term, -1)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func GetLessonsTable(stu *model.User, year string, term string) (interface{}, er
 	return model.TransformLessonTable(&f), err
 }
 func GetExamInfo(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(), year, term, 0)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfExamInfo(stu.ZfUrlFLag), year, term, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func GetExamInfo(stu *model.User, year string, term string) (interface{}, error)
 }
 
 func GetScore(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfScore(), year, term, -1)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfScore(stu.ZfUrlFLag), year, term, -1)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func GetScore(stu *model.User, year string, term string) (interface{}, error) {
 	return model.TransformScoreInfo(&f), err
 }
 func GetMidTermScore(stu *model.User, year string, term string) (interface{}, error) {
-	res, err := fetchTermRelatedInfo(stu, zf.ZfMinTermScore(), year, term, -1)
+	res, err := fetchTermRelatedInfo(stu, zf.ZfMinTermScore(stu.ZfUrlFLag), year, term, -1)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func GetEmptyRoomInfo(stu *model.User, year string, term string, campus string, 
 		campus = "A61400B98155D41AE0550113465EF1CF"
 	}
 	requestData := genEmptyRoomReqData(year, term, campus, week, weekday, classPeriod)
-	s, err := f.PostForm(zf.ZfEmptyClassRoom(), requestData)
+	s, err := f.PostForm(zf.ZfEmptyClassRoom(stu.ZfUrlFLag), requestData)
 
 	if len(s) == 0 {
 		service.ForgetUserByUsername(service.ZFPrefix, stu.Username)

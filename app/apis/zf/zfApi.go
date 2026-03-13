@@ -1,47 +1,75 @@
 package zf
 
 import (
-	"funnel/app/apis"
-	"funnel/config"
+	"funnel/config/config"
+	"net/url"
 	"strconv"
-	"strings"
 	"time"
 )
 
-func ChooseURL() string {
-	if config.Redis.Exists("zf_url").Val() != 1 {
-		config.Redis.Set("zf_url", "bk", 0)
+var UrlMap = config.Config.GetStringMapString("zf.url")
+
+const defaultURL = "http://www.gdjw.zjut.edu.cn/jwglxt/"
+
+const (
+	ZFURLDefaultFlag = "default"
+	ZFURLMainFlag    = "main"
+	ZFURLJfFlag      = "jf"
+)
+
+// UrlToFLag 用于获取url对应的flag, 默认返回main
+func UrlToFLag(rawUrl string) string {
+	u, err := url.Parse(rawUrl)
+	if err != nil {
+		return ZFURLMainFlag
 	}
-	if strings.Compare(config.Redis.Get("zf_url").String(), "new") == 0 {
-		return apis.ZF_URL
+	for k, v := range UrlMap {
+		if k == "default" {
+			continue
+		}
+		u2, err := url.Parse(v)
+		if err != nil {
+			continue
+		}
+		if u.Host == u2.Host {
+			return k
+		}
+	}
+	return ZFURLMainFlag
+}
+
+// ChooseURL 根据flag 选择正方 host
+func ChooseURL(flag string) string {
+	if u, ok := UrlMap[flag]; ok {
+		return u
 	} else {
-		return apis.ZF_BK_URL
+		return defaultURL
 	}
 }
 
-func ZfLoginGetPublickey() string {
-	return ChooseURL() + "xtgl/login_getPublicKey.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
+func ZfLoginGetPublickey(flag string) string {
+	return ChooseURL(flag) + "xtgl/login_getPublicKey.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
 }
-func ZfLoginHome() string {
-	return ChooseURL() + "xtgl/login_slogin.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
+func ZfLoginHome(flag string) string {
+	return ChooseURL(flag) + "xtgl/login_slogin.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
 }
-func ZfExamInfo() string {
-	return ChooseURL() + "kwgl/kscx_cxXsksxxIndex.html?doType=query"
+func ZfExamInfo(flag string) string {
+	return ChooseURL(flag) + "kwgl/kscx_cxXsksxxIndex.html?doType=query"
 }
-func ZfClassTable() string {
-	return ChooseURL() + "kbcx/xskbcx_cxXsgrkb.html?gnmkdm=N2151&su="
+func ZfClassTable(flag string) string {
+	return ChooseURL(flag) + "kbcx/xskbcx_cxXsgrkb.html?gnmkdm=N2151&su="
 }
-func ZfScore() string {
-	return ChooseURL() + "cjcx/cjcx_cxDgXscj.html?doType=query&gnmkdm=N305005"
+func ZfScore(flag string) string {
+	return ChooseURL(flag) + "cjcx/cjcx_cxDgXscj.html?doType=query&gnmkdm=N305005"
 }
-func ZfMinTermScore() string {
-	return ChooseURL() + "design/funcData_cxFuncDataList.html?func_widget_guid=5EF567BFD3CE243EE053A11310AC1252&gnmkdm=N305013"
-}
-
-func ZfCaptchaURL() string {
-	return ChooseURL() + "zfcaptchaLogin?instanceId=zfcaptchaLogin"
+func ZfMinTermScore(flag string) string {
+	return ChooseURL(flag) + "design/funcData_cxFuncDataList.html?func_widget_guid=5EF567BFD3CE243EE053A11310AC1252&gnmkdm=N305013"
 }
 
-func ZfEmptyClassRoom() string {
-	return ChooseURL() + "cdjy/cdjy_cxKxcdlb.html?doType=query"
+func ZfCaptchaURL(flag string) string {
+	return ChooseURL(flag) + "zfcaptchaLogin?instanceId=zfcaptchaLogin"
+}
+
+func ZfEmptyClassRoom(flag string) string {
+	return ChooseURL(flag) + "cdjy/cdjy_cxKxcdlb.html?doType=query"
 }
