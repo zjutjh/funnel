@@ -7,6 +7,7 @@ import (
 	"funnel/app/model"
 	"funnel/app/service/zfService"
 	"funnel/app/utils"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 )
@@ -137,6 +138,7 @@ func GetRoomInfo(context *gin.Context) {
 	var f model.EmptyRoomRawInfo
 	err = json.Unmarshal([]byte(result), &f)
 	if err != nil {
+		slog.Error("反序列化失败", "err", err, "content", result)
 		controller.ErrorHandle(context, err)
 		return
 	}

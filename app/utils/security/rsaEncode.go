@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math/big"
 	"strconv"
 )
@@ -20,7 +21,7 @@ func GetEncryptPassword(publicKey []byte, password string) (string, error) {
 	K := &RSAPublicKey{}
 	err := json.Unmarshal(publicKey, K)
 	if err != nil {
-		fmt.Println(err)
+		slog.Error("反序列化失败", "err", err, "content", string(publicKey))
 		return "", err
 	}
 

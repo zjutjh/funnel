@@ -8,6 +8,7 @@ import (
 	"funnel/app/model"
 	"funnel/app/service"
 	"funnel/app/utils/fetch"
+	"log/slog"
 	"net/url"
 	"sort"
 )
@@ -19,6 +20,9 @@ func GetLessonsTable(stu *model.User, year string, term string) (interface{}, er
 	}
 	var f model.LessonsTableRawInfo
 	err = json.Unmarshal([]byte(res), &f)
+	if err != nil {
+		slog.Error("反序列化失败", "err", err, "content", res)
+	}
 	return model.TransformLessonTable(&f), err
 }
 func GetExamInfo(stu *model.User, year string, term string) (interface{}, error) {
@@ -29,6 +33,7 @@ func GetExamInfo(stu *model.User, year string, term string) (interface{}, error)
 	var f model.ExamRawInfo
 	err = json.Unmarshal([]byte(res), &f)
 	if err != nil {
+		slog.Error("反序列化失败", "err", err, "content", res)
 		return nil, err
 	}
 	result := model.TransformExamInfo(&f)
@@ -45,6 +50,9 @@ func GetScore(stu *model.User, year string, term string) (interface{}, error) {
 	}
 	var f model.ScoreRawInfo
 	err = json.Unmarshal([]byte(res), &f)
+	if err != nil {
+		slog.Error("反序列化失败", "err", err, "content", res)
+	}
 	return model.TransformScoreInfo(&f), err
 }
 func GetMidTermScore(stu *model.User, year string, term string) (interface{}, error) {
@@ -54,6 +62,9 @@ func GetMidTermScore(stu *model.User, year string, term string) (interface{}, er
 	}
 	var f model.MidTermScoreRawInfo
 	err = json.Unmarshal([]byte(res), &f)
+	if err != nil {
+		slog.Error("反序列化失败", "err", err, "content", res)
+	}
 	return model.TransformMidTermScoreInfo(&f), err
 }
 

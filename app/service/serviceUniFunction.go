@@ -6,6 +6,7 @@ import (
 	"funnel/app/model"
 	"funnel/config"
 	"hash/crc32"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -28,6 +29,7 @@ func GetUser(prefix string, username string, password string) (*model.User, erro
 	err := json.Unmarshal([]byte(Session.Val()), user)
 
 	if err != nil {
+		slog.Error("反序列化失败", "err", err, "content", Session.Val())
 		config.Redis.Del(getRediskey(prefix, username, password))
 		return nil, errors.ERR_JSON_DESER
 	}
