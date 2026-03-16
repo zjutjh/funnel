@@ -54,7 +54,7 @@ func ZfLoginHome(flag string) string {
 	return ChooseURL(flag) + "xtgl/login_slogin.html?time=" + strconv.FormatInt(time.Now().Unix()*1000, 10)
 }
 func ZfExamInfo(flag string) string {
-	return ChooseURL(flag) + "kwgl/kscx_cxXsksxxIndex.html?doType=query"
+	return ChooseURL(flag) + "kwgl/kscx_cxXsksxxIndex.html?doType=query&gnmkdm=N358105"
 }
 func ZfClassTable(flag string) string {
 	return ChooseURL(flag) + "kbcx/xskbcx_cxXsgrkb.html?gnmkdm=N2151&su="
