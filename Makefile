@@ -1,36 +1,63 @@
-API_FILE := api/rest/gateway.api
-PROTO_FILE := api/rpc/worker.proto
+API_DIR := apps/funnel-api
+API_FILE := $(API_DIR)/funnel.api
+RPC_DIR := apps/funnel-rpc
+RPC_PROTO := $(RPC_DIR)/funnel.proto
+MODULE := funnel
+STYLE ?= go_zero
 
-GATEWAY_DIR := gateway
-WORKER_DIR := worker
-RPC_DIR := api/rpc
+.PHONY: build
+build:
+	go build -o bin/funnel .
 
-.PHONY: gen gen-api gen-rpc clean clean-api clean-rpc
+.PHONY: build-api
+build-api:
+	go build -o bin/funnel-api ./$(API_DIR)
 
-gen: gen-api gen-rpc
+.PHONY: build-rpc
+build-rpc:
+	go build -o bin/funnel-rpc ./$(RPC_DIR)
 
-gen-api:
-	goctl api go --api $(API_FILE) --dir $(GATEWAY_DIR)
+.PHONY: generate
+generate: generate-api generate-rpc
 
-gen-rpc:
-	goctl rpc protoc $(PROTO_FILE) \
-		--go_out=./$(RPC_DIR) \
-		--go-grpc_out=./$(RPC_DIR) \
-		--zrpc_out=./$(WORKER_DIR) \
+.PHONY: generate-api
+generate-api:
+	goctl api go --api $(API_FILE) --dir $(API_DIR) --style $(STYLE)
 
-clean: clean-api clean-rpc
+.PHONY: generate-rpc
+generate-rpc:
+	goctl rpc protoc $(RPC_PROTO) --go_out=$(RPC_DIR) --go-grpc_out=$(RPC_DIR) --zrpc_out=$(RPC_DIR) --style $(STYLE) --module $(MODULE)
 
+.PHONY: configure
+configure: tools
 
-clean-api:
-	rm -rf $(GATEWAY_DIR)
+.PHONY: tools
+tools:
+	go install github.com/zeromicro/go-zero/tools/goctl@latest
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
-clean-rpc:
-	rm -rf $(RPC_DIR)/client
-	rm -rf $(RPC_DIR)/worker
-	rm -rf $(RPC_DIR)/funnel
-	rm -rf .gen
-	rm -rf $(WORKER_DIR)/client
-	rm -rf $(WORKER_DIR)/etc
-	rm -rf $(WORKER_DIR)/internal/logic
-	rm -rf $(WORKER_DIR)/internal/server
-	rm -f $(WORKER_DIR)/worker.go
+.PHONY: fmt
+fmt:
+	goctl api format --dir $(API_DIR)
+	go fmt ./...
+
+.PHONY: vet
+vet:
+	go vet ./...
+
+.PHONY: test
+test:
+	go test ./...
+
+.PHONY: run
+run:
+	go run .
+
+.PHONY: run-api
+run-api:
+	go run ./$(API_DIR)
+
+.PHONY: run-rpc
+run-rpc:
+	go run ./$(RPC_DIR)

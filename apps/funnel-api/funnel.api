@@ -1,0 +1,195 @@
+syntax = "v1"
+
+info(
+    title: "funnel gateway"
+    desc: "面向前端和上游业务的 gateway 接口"
+    author: "codex"
+    version: "v1"
+)
+
+type ZfLoginReq {
+    LoginType string `json:"loginType,options=ZF|OAUTH"`
+    ForceRefresh bool `json:"forceRefresh,optional"`
+}
+
+type LibraryLoginReq {
+    ForceRefresh bool `json:"forceRefresh,optional"`
+}
+
+type LoginResp {
+    Session string `json:"session"`
+}
+
+type SessionTermReq {
+    Session string `json:"session"`
+    Year string `json:"year"`
+    Term string `json:"term"`
+}
+
+type GetRoomInfoReq {
+    Session string `json:"session"`
+    Year string `json:"year"`
+    Term string `json:"term"`
+    Campus string `json:"campus"`
+    Weekday string `json:"weekday"`
+    Week string `json:"week"`
+    Sections string `json:"sections"`
+}
+
+type LibraryBorrowReq {
+    Session string `json:"session"`
+    Page int64 `json:"page,optional"`
+}
+
+type StudentInfo {
+    Name string `json:"name"`
+    ClassName string `json:"className"`
+}
+
+type Score {
+    Score string `json:"score"`
+    ScorePoint string `json:"scorePoint"`
+    TeacherName string `json:"teacherName"`
+    LessonID string `json:"lessonID"`
+    LessonName string `json:"lessonName"`
+    ClassName string `json:"className"`
+    Credits string `json:"credits"`
+    LessonType string `json:"lessonType"`
+    ExamType string `json:"examType"`
+    SubmitTime string `json:"submitTime"`
+    SubmitName string `json:"submitName"`
+    SchoolTerm string `json:"schoolTerm"`
+    SchoolYear string `json:"schoolYear"`
+    Key string `json:"key"`
+}
+
+type MidTermScore {
+    Score string `json:"score"`
+    TeacherName string `json:"teacherName"`
+    LessonID string `json:"lessonID"`
+    LessonName string `json:"lessonName"`
+    ClassName string `json:"className"`
+    Credits string `json:"credits"`
+}
+
+type Lesson {
+    ID string `json:"id"`
+    Sections string `json:"sections"`
+    LessonName string `json:"lessonName"`
+    Campus string `json:"campus"`
+    LessonPlace string `json:"lessonPlace"`
+    PlaceID string `json:"placeID"`
+    TeacherName string `json:"teacherName"`
+    ClassName string `json:"className"`
+    ClassID string `json:"classID"`
+    Weekday string `json:"weekday"`
+    Week string `json:"week"`
+    LessonHours string `json:"lessonHours"`
+    Credits string `json:"credits"`
+    Type string `json:"type"`
+}
+
+type PracticeLesson {
+    LessonName string `json:"lessonName"`
+    TeacherName string `json:"teacherName"`
+    ClassName string `json:"className"`
+    Credits string `json:"credits"`
+}
+
+type Exam {
+    LessonID string `json:"lessonID"`
+    LessonName string `json:"lessonName"`
+    LessonPlace string `json:"lessonPlace"`
+    ExamPlace string `json:"examPlace"`
+    ExamTime string `json:"examTime"`
+    Campus string `json:"campus"`
+    TeacherName string `json:"teacherName"`
+    ClassName string `json:"className"`
+    Credits string `json:"credits"`
+    SeatNum string `json:"seatNum"`
+}
+
+type Room {
+    RoomName string `json:"roomName"`
+    BuildName string `json:"buildName"`
+    RoomSize string `json:"roomSize"`
+    RoomSeats string `json:"roomSeats"`
+    RoomSeatsForExam string `json:"roomSeatsForExam"`
+    Campus string `json:"campus"`
+    Type string `json:"type"`
+}
+
+type BorrowedBook {
+    Name string `json:"name"`
+    LibraryID string `json:"libraryID"`
+    LibraryPlace string `json:"libraryPlace"`
+    Time string `json:"time"`
+    ReturnTime string `json:"returnTime"`
+    RenewalsTimes string `json:"renewalsTimes"`
+    OverdueTime string `json:"overdueTime"`
+}
+
+type GetScoreResp {
+    Scores []Score `json:"scores"`
+}
+
+type GetMidTermScoreResp {
+    Scores []MidTermScore `json:"scores"`
+}
+
+type GetClassTableResp {
+    LessonsTable []Lesson `json:"lessonsTable"`
+    PracticeLessons []PracticeLesson `json:"practiceLessons"`
+    Info StudentInfo `json:"info"`
+}
+
+type GetExamInfoResp {
+    Exams []Exam `json:"exams"`
+}
+
+type GetRoomInfoResp {
+    Rooms []Room `json:"rooms"`
+}
+
+type GetBorrowHistoryResp {
+    Books []BorrowedBook `json:"books"`
+}
+
+type GetCurrentBorrowResp {
+    Books []BorrowedBook `json:"books"`
+}
+
+@server(
+    prefix: /api/v1/funnel
+)
+service funnel-api {
+    @doc "触发正方登录，gateway 内部维护 cookie 缓存，返回 session token"
+    @handler ZfLogin
+    post /auth/zf/login (ZfLoginReq) returns (LoginResp)
+
+    @doc "触发图书馆登录，gateway 内部维护 cookie 缓存，返回 session token"
+    @handler LibraryLogin
+    post /auth/library/login (LibraryLoginReq) returns (LoginResp)
+
+    @handler GetScore
+    post /zf/score (SessionTermReq) returns (GetScoreResp)
+
+    @handler GetMidTermScore
+    post /zf/midterm-score (SessionTermReq) returns (GetMidTermScoreResp)
+
+    @handler GetClassTable
+    post /zf/class-table (SessionTermReq) returns (GetClassTableResp)
+
+    @handler GetExamInfo
+    post /zf/exam (SessionTermReq) returns (GetExamInfoResp)
+
+    @handler GetRoomInfo
+    post /zf/room (GetRoomInfoReq) returns (GetRoomInfoResp)
+
+    @handler GetBorrowHistory
+    post /library/borrow/history (LibraryBorrowReq) returns (GetBorrowHistoryResp)
+
+    @handler GetCurrentBorrow
+    post /library/borrow/current (LibraryBorrowReq) returns (GetCurrentBorrowResp)
+}
+

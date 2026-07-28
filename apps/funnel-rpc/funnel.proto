@@ -1,0 +1,194 @@
+syntax = "proto3";
+
+package funnel;
+
+option go_package = "./pb";
+
+// worker 内部登录方式。
+enum ZfLoginType {
+    ZF_LOGIN_TYPE_UNSPECIFIED = 0;
+    ZF_LOGIN_TYPE_CAPTCHA = 1;
+    ZF_LOGIN_TYPE_OAUTH = 2;
+}
+
+service WorkerZfService {
+    rpc ZfLogin(ZfLoginRequest) returns (ZfLoginResponse);
+    rpc LibraryLogin(LibraryLoginRequest) returns (LibraryLoginResponse);
+    rpc GetScore(ZfSessionTermRequest) returns (GetScoreResponse);
+    rpc GetMidTermScore(ZfSessionTermRequest) returns (GetMidTermScoreResponse);
+    rpc GetClassTable(ZfSessionTermRequest) returns (GetClassTableResponse);
+    rpc GetExamInfo(ZfSessionTermRequest) returns (GetExamInfoResponse);
+    rpc GetRoomInfo(GetRoomInfoRequest) returns (GetRoomInfoResponse);
+    rpc GetBorrowHistory(LibrarySessionPageRequest) returns (GetBorrowHistoryResponse);
+    rpc GetCurrentBorrow(LibrarySessionPageRequest) returns (GetCurrentBorrowResponse);
+}
+
+message ZfLoginRequest {
+    string username = 1;
+    string password = 2;
+    ZfLoginType login_type = 3;
+}
+
+message ZfLoginResponse {
+    string zf_session = 1;
+    string route = 2;
+    string zf_url_flag = 3;
+}
+
+message LibraryLoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LibraryLoginResponse {
+    string lib_session = 1;
+}
+
+message ZfSessionTermRequest {
+    string zf_session = 1;
+    string route = 2;
+    string zf_url_flag = 3;
+    // 沿用现有业务语义，支持 "全" 或具体学年。
+    string year = 4;
+    // 沿用现有业务语义，支持 "上" "下" "短" "全"。
+    string term = 5;
+}
+
+message GetRoomInfoRequest {
+    string zf_session = 1;
+    string route = 2;
+    string zf_url_flag = 3;
+    string year = 4;
+    string term = 5;
+    // 支持 "朝晖" "屏峰" "莫干山"。
+    string campus = 6;
+    // 星期几，兼容现有 1/2/3... 语义。
+    string weekday = 7;
+    // 第几周的 2 次幂和。
+    string week = 8;
+    // 第几节课的 2 次幂和。
+    string sections = 9;
+}
+
+message LibrarySessionPageRequest {
+    string lib_session = 1;
+    int32 page = 2;
+}
+
+message GetScoreResponse {
+    repeated Score scores = 1;
+}
+
+message GetMidTermScoreResponse {
+    repeated MidTermScore scores = 1;
+}
+
+message GetClassTableResponse {
+    repeated Lesson lessons_table = 1;
+    repeated PracticeLesson practice_lessons = 2;
+    StudentInfo info = 3;
+}
+
+message GetExamInfoResponse {
+    repeated Exam exams = 1;
+}
+
+message GetRoomInfoResponse {
+    repeated Room rooms = 1;
+}
+
+message GetBorrowHistoryResponse {
+    repeated BorrowedBook books = 1;
+}
+
+message GetCurrentBorrowResponse {
+    repeated BorrowedBook books = 1;
+}
+
+message StudentInfo {
+    string name = 1;
+    string class_name = 2;
+}
+
+message Score {
+    string score = 1;
+    string score_point = 2;
+    string teacher_name = 3;
+    string lesson_id = 4;
+    string lesson_name = 5;
+    string class_name = 6;
+    string credits = 7;
+    string lesson_type = 8;
+    string exam_type = 9;
+    string submit_time = 10;
+    string submit_name = 11;
+    string school_term = 12;
+    string school_year = 13;
+    string key = 14;
+}
+
+message MidTermScore {
+    string score = 1;
+    string teacher_name = 2;
+    string lesson_id = 3;
+    string lesson_name = 4;
+    string class_name = 5;
+    string credits = 6;
+}
+
+message Lesson {
+    string id = 1;
+    string sections = 2;
+    string lesson_name = 3;
+    string campus = 4;
+    string lesson_place = 5;
+    string place_id = 6;
+    string teacher_name = 7;
+    string class_name = 8;
+    string class_id = 9;
+    string weekday = 10;
+    string week = 11;
+    string lesson_hours = 12;
+    string credits = 13;
+    string type = 14;
+}
+
+message PracticeLesson {
+    string lesson_name = 1;
+    string teacher_name = 2;
+    string class_name = 3;
+    string credits = 4;
+}
+
+message Exam {
+    string lesson_id = 1;
+    string lesson_name = 2;
+    string lesson_place = 3;
+    string exam_place = 4;
+    string exam_time = 5;
+    string campus = 6;
+    string teacher_name = 7;
+    string class_name = 8;
+    string credits = 9;
+    string seat_num = 10;
+}
+
+message Room {
+    string room_name = 1;
+    string build_name = 2;
+    string room_size = 3;
+    string room_seats = 4;
+    string room_seats_for_exam = 5;
+    string campus = 6;
+    string type = 7;
+}
+
+message BorrowedBook {
+    string name = 1;
+    string library_id = 2;
+    string library_place = 3;
+    string time = 4;
+    string return_time = 5;
+    string renewals_times = 6;
+    string overdue_time = 7;
+}

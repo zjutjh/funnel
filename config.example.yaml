@@ -1,0 +1,23 @@
+FunnelAPI:
+  Name: funnel-api
+  Host: 0.0.0.0
+  Port: 8888
+  Mode: dev
+
+FunnelRPC:
+  Name: funnel.rpc
+  ListenOn: 0.0.0.0:8080
+  Mode: dev
+
+  ZF:
+    BaseURL: http://www.gdjw.zjut.edu.cn/jwglxt/
+    Public:
+      Username: ""
+      Password: ""
+    SessionPool:
+      MaxSize: 64
+      TTLMinute: 30
+      FillWorkers: 3
+
+  Oauth:
+    BaseURL: ""

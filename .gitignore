@@ -42,3 +42,6 @@ config.yaml
 /register/generate/status_codes_generated.go
 
 .gocache
+
+.DS_Store
+/bin/
