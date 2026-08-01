@@ -54,8 +54,12 @@ func (f *Fetch) GetRedirect(url string) (*url.URL,[]byte, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	defer response.Body.Close()
 	if response.StatusCode != 302 {
-		body, _ := io.ReadAll(response.Body);
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return nil, nil, err
+		}
 		return nil, body, errors2.ERR_UNKNOWN_ERROR
 	}
 	location, err := response.Location()

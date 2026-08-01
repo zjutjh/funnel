@@ -243,7 +243,8 @@ func loginByOauth(username string, password string) (*model.User, error) {
 		if body != nil && strings.Contains(string(body), "统一密码未更新") {
 			return nil, errors.ERR_OAUTH_NOT_UPDATE
 		}
-		return nil, errors.ERR_ZF_UNAVAILABLE
+		slog.Error("统一认证第二跳重定向失败","err", err,"url", getRedirectUrl1.String(),)
+		return nil, err
 	}
 	getRedirectUrl3,_, err := f.GetRedirect(getRedirectUrl2.String())
 	if err != nil {
