@@ -77,7 +77,6 @@ func (f *Fetch) GetRaw(url string) (*http.Response, error) {
 	for _, v := range f.Cookie {
 		request.AddCookie(v)
 	}
-	f.client.Do(request)
 	response, err := f.client.Do(request)
 	if err != nil {
 		return nil, err
