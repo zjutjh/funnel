@@ -30,6 +30,10 @@ func ErrorHandle(context *gin.Context, err error) {
 		{
 			exp = errors.OAuthNotUpdate
 		}
+	case errors.ERR_ZF_UNAVAILABLE:
+		{
+			exp = errors.ZFUnavailable
+		}
 	default:
 		{
 			exp = errors.UnKnown

@@ -49,19 +49,24 @@ func (f *Fetch) Get(url string) ([]byte, error) {
 	return s, nil
 }
 
-func (f *Fetch) GetRedirect(url string) (*url.URL, error) {
+func (f *Fetch) GetRedirect(url string) (*url.URL,[]byte, error) {
 	response, err := f.GetRaw(url)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+	defer response.Body.Close()
 	if response.StatusCode != 302 {
-		return nil, errors2.ERR_UNKNOWN_ERROR
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, body, errors2.ERR_UNKNOWN_ERROR
 	}
 	location, err := response.Location()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return location, nil
+	return location, nil, nil
 }
 
 func (f *Fetch) GetRaw(url string) (*http.Response, error) {
@@ -72,7 +77,6 @@ func (f *Fetch) GetRaw(url string) (*http.Response, error) {
 	for _, v := range f.Cookie {
 		request.AddCookie(v)
 	}
-	f.client.Do(request)
 	response, err := f.client.Do(request)
 	if err != nil {
 		return nil, err

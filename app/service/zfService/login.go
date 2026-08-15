@@ -234,19 +234,23 @@ func loginByOauth(username string, password string) (*model.User, error) {
 		return nil, err
 	}
 	f.Cookie = []*http.Cookie{}
-	getRedirectUrl1, err := f.GetRedirect(postRedirectUrl.String())
+	getRedirectUrl1,_, err := f.GetRedirect(postRedirectUrl.String())
 	if err != nil {
 		return nil, err
 	}
-	getRedirectUrl2, err := f.GetRedirect(getRedirectUrl1.String())
+	getRedirectUrl2,body, err := f.GetRedirect(getRedirectUrl1.String())
 	if err != nil {
-		return nil, errors.ERR_OAUTH_NOT_UPDATE
+		if body != nil && strings.Contains(string(body), "统一密码未更新") {
+			return nil, errors.ERR_OAUTH_NOT_UPDATE
+		}
+		slog.Error("统一认证第二跳重定向失败","err", err,"url", getRedirectUrl1.String(),)
+		return nil, err
 	}
-	getRedirectUrl3, err := f.GetRedirect(getRedirectUrl2.String())
+	getRedirectUrl3,_, err := f.GetRedirect(getRedirectUrl2.String())
 	if err != nil {
 		return nil, err
 	}
-	getRedirectUrl4, err := f.GetRedirect(getRedirectUrl3.String())
+	getRedirectUrl4, _, err := f.GetRedirect(getRedirectUrl3.String())
 	if err != nil {
 		return nil, err
 	}
